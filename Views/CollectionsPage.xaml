@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="PosterFly.Views.CollectionsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Collections">
+    
+    <StackLayout Padding="20" Spacing="15">
+        
+        <!-- Header with actions -->
+        <StackLayout Orientation="Horizontal" Spacing="10">
+            <Label Text="Collections" 
+                   FontSize="Large" 
+                   FontAttributes="Bold" 
+                   VerticalOptions="Center" 
+                   HorizontalOptions="StartAndExpand"/>
+            <Button Text="+ New" 
+                    Command="{Binding NewCollectionCommand}"
+                    BackgroundColor="Green" 
+                    TextColor="White"/>
+            <Button Text="Import" 
+                    Command="{Binding ImportCollectionCommand}"
+                    BackgroundColor="Blue" 
+                    TextColor="White"/>
+        </StackLayout>
+
+        <!-- Collections List -->
+        <CollectionView ItemsSource="{Binding Collections}" x:Name="CollectionsListView">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="White" Padding="15" Margin="0,5" CornerRadius="8" HasShadow="True">
+                        <StackLayout Spacing="10">
+                            
+                            <!-- Collection Header -->
+                            <StackLayout Orientation="Horizontal">
+                                <Label Text="{Binding Name}" 
+                                       FontSize="Large" 
+                                       FontAttributes="Bold" 
+                                       HorizontalOptions="StartAndExpand"
+                                       VerticalOptions="Center"/>
+                                <Button Text="⋯" 
+                                        BackgroundColor="LightGray"
+                                        TextColor="Black"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        CornerRadius="20"/>
+                            </StackLayout>
+                            
+                            <!-- Collection Description -->
+                            <Label Text="{Binding Description}" 
+                                   FontSize="Small" 
+                                   TextColor="Gray"
+                                   IsVisible="{Binding Description, Converter={StaticResource StringToBoolConverter}}"/>
+                            
+                            <!-- Collection Stats -->
+                            <StackLayout Orientation="Horizontal" Spacing="20">
+                                <Label Text="{Binding Requests.Count, StringFormat='Requests: {0}'}" 
+                                       FontSize="Small" 
+                                       TextColor="DarkBlue"/>
+                                <Label Text="{Binding LastModified, StringFormat='Modified: {0:MMM dd}'}" 
+                                       FontSize="Small" 
+                                       TextColor="Gray"/>
+                            </StackLayout>
+                            
+                            <!-- Action Buttons -->
+                            <StackLayout Orientation="Horizontal" Spacing="10">
+                                <Button Text="Open" 
+                                        Command="{Binding Source={x:Reference CollectionsListView}, Path=BindingContext.OpenCollectionCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="DodgerBlue" 
+                                        TextColor="White"
+                                        FontSize="Small"/>
+                                <Button Text="Export" 
+                                        Command="{Binding Source={x:Reference CollectionsListView}, Path=BindingContext.ExportCollectionCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="Orange" 
+                                        TextColor="White"
+                                        FontSize="Small"/>
+                                <Button Text="Delete" 
+                                        Command="{Binding Source={x:Reference CollectionsListView}, Path=BindingContext.DeleteCollectionCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="Red" 
+                                        TextColor="White"
+                                        FontSize="Small"/>
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
+        <!-- Empty State -->
+        <StackLayout IsVisible="{Binding HasNoCollections}" VerticalOptions="CenterAndExpand">
+            <Label Text="No collections yet" 
+                   FontSize="Large" 
+                   HorizontalOptions="Center" 
+                   TextColor="Gray"/>
+            <Label Text="Create your first collection to organize your API requests" 
+                   FontSize="Medium" 
+                   HorizontalOptions="Center" 
+                   TextColor="Gray"
+                   Margin="20"/>
+            <Button Text="Create Collection" 
+                    Command="{Binding NewCollectionCommand}"
+                    BackgroundColor="Green" 
+                    TextColor="White"
+                    HorizontalOptions="Center"/>
+        </StackLayout>
+        
+    </StackLayout>
+    
+</ContentPage>

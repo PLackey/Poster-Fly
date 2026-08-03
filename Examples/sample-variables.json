@@ -1,0 +1,90 @@
+[
+  {
+    "id": "var-001",
+    "name": "baseUrl",
+    "value": "https://jsonplaceholder.typicode.com",
+    "description": "Base URL for the JSONPlaceholder API",
+    "scope": "Global",
+    "usageCount": 25,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:45:00Z",
+    "isSecret": false
+  },
+  {
+    "id": "var-002",
+    "name": "authToken",
+    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "description": "JWT authentication token",
+    "scope": "Global",
+    "usageCount": 15,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:30:00Z",
+    "isSecret": true
+  },
+  {
+    "id": "var-003",
+    "name": "userId",
+    "value": "1",
+    "description": "Current user ID for testing",
+    "scope": "Global",
+    "usageCount": 12,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:20:00Z",
+    "isSecret": false
+  },
+  {
+    "id": "var-004",
+    "name": "userName",
+    "value": "John Doe",
+    "description": "User name for creating test users",
+    "scope": "Global",
+    "usageCount": 8,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:15:00Z",
+    "isSecret": false
+  },
+  {
+    "id": "var-005",
+    "name": "userEmail",
+    "value": "john.doe@example.com",
+    "description": "Email address for test users",
+    "scope": "Global",
+    "usageCount": 7,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:10:00Z",
+    "isSecret": false
+  },
+  {
+    "id": "var-006",
+    "name": "apiVersion",
+    "value": "v1",
+    "description": "API version header",
+    "scope": "Global",
+    "usageCount": 20,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:40:00Z",
+    "isSecret": false
+  },
+  {
+    "id": "var-007",
+    "name": "userAgent",
+    "value": "PosterFly/1.0 (API Testing Tool)",
+    "description": "User-Agent string for requests",
+    "scope": "Global",
+    "usageCount": 30,
+    "createdAt": "2026-08-01T10:00:00Z",
+    "lastUsed": "2026-08-03T09:50:00Z",
+    "isSecret": false
+  },
+  {
+    "id": "var-008",
+    "name": "graphqlEndpoint",
+    "value": "https://api.github.com",
+    "description": "GraphQL API endpoint",
+    "scope": "Global",
+    "usageCount": 5,
+    "createdAt": "2026-08-02T10:00:00Z",
+    "lastUsed": "2026-08-03T08:30:00Z",
+    "isSecret": false
+  }
+]

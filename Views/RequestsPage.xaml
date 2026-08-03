@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="PosterFly.Views.RequestsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="API Requests">
+    
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+            
+            <!-- Request Type Selection -->
+            <Frame BackgroundColor="LightGray" Padding="10" CornerRadius="5">
+                <StackLayout Orientation="Horizontal" Spacing="10">
+                    <Label Text="Request Type:" VerticalOptions="Center" FontAttributes="Bold"/>
+                    <Picker x:Name="RequestTypePicker" 
+                            ItemsSource="{Binding RequestTypes}"
+                            SelectedItem="{Binding SelectedRequestType}"
+                            WidthRequest="120"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- URL Input -->
+            <Frame BackgroundColor="White" Padding="10" CornerRadius="5" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <StackLayout Orientation="Horizontal" Spacing="10">
+                        <Picker x:Name="HttpMethodPicker" 
+                                ItemsSource="{Binding HttpMethods}"
+                                SelectedItem="{Binding SelectedHttpMethod}"
+                                WidthRequest="100"
+                                IsVisible="{Binding IsHttpRequest}"/>
+                        <Entry x:Name="UrlEntry"
+                               Text="{Binding CurrentRequest.Url}"
+                               Placeholder="Enter URL (e.g., https://api.example.com/users)"
+                               HorizontalOptions="FillAndExpand"/>
+                        <Button Text="Send" 
+                                Command="{Binding SendRequestCommand}"
+                                BackgroundColor="DodgerBlue" 
+                                TextColor="White"
+                                WidthRequest="80"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Protocol Options -->
+            <Frame BackgroundColor="LightBlue" Padding="10" CornerRadius="5" IsVisible="{Binding IsHttpRequest}">
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                    <CheckBox x:Name="SslCheckBox" IsChecked="{Binding CurrentRequest.UseSSL}"/>
+                    <Label Text="Use SSL/TLS" VerticalOptions="Center"/>
+                    <CheckBox x:Name="Http2CheckBox" IsChecked="{Binding CurrentRequest.UseHttp2}"/>
+                    <Label Text="HTTP/2" VerticalOptions="Center"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Headers Section -->
+            <Frame BackgroundColor="White" Padding="10" CornerRadius="5" HasShadow="True" IsVisible="{Binding IsHttpRequest}">
+                <StackLayout Spacing="10">
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Headers" FontAttributes="Bold" HorizontalOptions="StartAndExpand"/>
+                        <Button Text="+ Add Header" 
+                                Command="{Binding AddHeaderCommand}"
+                                BackgroundColor="Green" 
+                                TextColor="White"
+                                FontSize="Small"/>
+                    </StackLayout>
+                    
+                    <CollectionView ItemsSource="{Binding CurrentRequest.Headers}" x:Name="HeadersCollection">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,*,Auto" Padding="5" ColumnSpacing="10">
+                                    <Entry Grid.Column="0" 
+                                           Text="{Binding Key}" 
+                                           Placeholder="Header name"/>
+                                    <Entry Grid.Column="1" 
+                                           Text="{Binding Value}" 
+                                           Placeholder="Header value"/>
+                                    <Button Grid.Column="2" 
+                                            Text="×" 
+                                            BackgroundColor="Red" 
+                                            TextColor="White"
+                                            WidthRequest="30" 
+                                            HeightRequest="30"
+                                            CornerRadius="15"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+
+            <!-- Body Section for HTTP -->
+            <Frame BackgroundColor="White" Padding="10" CornerRadius="5" HasShadow="True" 
+                   IsVisible="{Binding ShowBodySection}">
+                <StackLayout Spacing="10">
+                    <StackLayout Orientation="Horizontal" Spacing="10">
+                        <Label Text="Body Type:" VerticalOptions="Center" FontAttributes="Bold"/>
+                        <Picker ItemsSource="{Binding BodyTypes}"
+                                SelectedItem="{Binding CurrentRequest.BodyType}"
+                                WidthRequest="120"/>
+                    </StackLayout>
+                    
+                    <Editor x:Name="BodyEditor"
+                            Text="{Binding CurrentRequest.Body}"
+                            Placeholder="Request body (JSON, XML, etc.)"
+                            HeightRequest="200"
+                            BackgroundColor="LightGray"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- GraphQL Section -->
+            <Frame BackgroundColor="White" Padding="10" CornerRadius="5" HasShadow="True" 
+                   IsVisible="{Binding IsGraphQLRequest}">
+                <StackLayout Spacing="10">
+                    <Label Text="GraphQL Query" FontAttributes="Bold"/>
+                    <Editor Text="{Binding CurrentRequest.GraphQLQuery}"
+                            Placeholder="query { users { id name email } }"
+                            HeightRequest="150"
+                            BackgroundColor="LightGray"/>
+                    
+                    <Label Text="Variables (JSON)" FontAttributes="Bold"/>
+                    <Editor Text="{Binding CurrentRequest.GraphQLVariables}"
+                            Placeholder='{ "limit": 10 }'
+                            HeightRequest="100"
+                            BackgroundColor="LightGray"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- gRPC Section -->
+            <Frame BackgroundColor="White" Padding="10" CornerRadius="5" HasShadow="True" 
+                   IsVisible="{Binding IsGrpcRequest}">
+                <StackLayout Spacing="10">
+                    <Label Text="gRPC Configuration" FontAttributes="Bold"/>
+                    <Entry Text="{Binding CurrentRequest.GrpcService}"
+                           Placeholder="Service name (e.g., UserService)"/>
+                    <Entry Text="{Binding CurrentRequest.GrpcMethod}"
+                           Placeholder="Method name (e.g., GetUser)"/>
+                    <Entry Text="{Binding CurrentRequest.ProtoFile}"
+                           Placeholder="Proto file path"/>
+                    
+                    <Label Text="Request Message (JSON)" FontAttributes="Bold"/>
+                    <Editor Text="{Binding CurrentRequest.Body}"
+                            Placeholder='{ "userId": 123 }'
+                            HeightRequest="100"
+                            BackgroundColor="LightGray"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Response Section -->
+            <Frame BackgroundColor="White" Padding="10" CornerRadius="5" HasShadow="True" 
+                   IsVisible="{Binding HasResponse}">
+                <StackLayout Spacing="10">
+                    <Label Text="Response" FontAttributes="Bold" FontSize="Large"/>
+                    
+                    <!-- Status and Timing -->
+                    <StackLayout Orientation="Horizontal" Spacing="15">
+                        <Label Text="{Binding LastResponse.StatusCode, StringFormat='Status: {0}'}" 
+                               TextColor="{Binding LastResponse.IsSuccess, Converter={StaticResource BoolToColorConverter}}"/>
+                        <Label Text="{Binding LastResponse.ResponseTimeMs, StringFormat='Time: {0}ms'}"/>
+                        <Label Text="{Binding LastResponse.ContentLength, StringFormat='Size: {0} bytes'}"/>
+                    </StackLayout>
+                    
+                    <!-- Response Headers -->
+                    <Expander>
+                        <Expander.Header>
+                            <Label Text="Response Headers" FontAttributes="Bold"/>
+                        </Expander.Header>
+                        <CollectionView ItemsSource="{Binding ResponseHeadersList}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,*" Padding="5">
+                                        <Label Grid.Column="0" Text="{Binding Key}" FontAttributes="Bold"/>
+                                        <Label Grid.Column="1" Text="{Binding Value}" Margin="10,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Expander>
+                    
+                    <!-- Response Body -->
+                    <Label Text="Response Body" FontAttributes="Bold"/>
+                    <Frame BackgroundColor="LightGray" Padding="10">
+                        <Label Text="{Binding LastResponse.Body}" FontFamily="Courier"/>
+                    </Frame>
+                </StackLayout>
+            </Frame>
+
+            <!-- Save Request -->
+            <Button Text="Save Request" 
+                    Command="{Binding SaveRequestCommand}"
+                    BackgroundColor="Orange" 
+                    TextColor="White"
+                    IsVisible="{Binding HasResponse}"/>
+
+        </StackLayout>
+    </ScrollView>
+    
+</ContentPage>

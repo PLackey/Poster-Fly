@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView x:Class="PosterFly.Controls.VariableAutoCompleteEntry"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    
+    <StackLayout Spacing="0">
+        <!-- Main Entry -->
+        <Entry x:Name="MainEntry"
+               Text="{Binding Text, Source={x:Reference VariableAutoCompleteEntry}}"
+               Placeholder="{Binding Placeholder, Source={x:Reference VariableAutoCompleteEntry}}"
+               TextChanged="OnTextChanged"
+               Focused="OnEntryFocused"
+               Unfocused="OnEntryUnfocused"/>
+        
+        <!-- Auto-complete dropdown -->
+        <Frame x:Name="AutoCompleteFrame"
+               BackgroundColor="White"
+               BorderColor="LightGray"
+               CornerRadius="5"
+               Padding="0"
+               IsVisible="False"
+               HasShadow="True">
+            
+            <CollectionView x:Name="SuggestionsCollectionView"
+                            ItemsSource="{Binding Suggestions, Source={x:Reference VariableAutoCompleteEntry}}"
+                            MaximumHeightRequest="200">
+                
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10,5">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSuggestionTapped"/>
+                            </Grid.GestureRecognizers>
+                            
+                            <StackLayout Orientation="Horizontal" Spacing="10">
+                                <Label Text="{Binding Name}" 
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"/>
+                                <Label Text="{Binding Value}" 
+                                       FontSize="Small"
+                                       TextColor="Gray"
+                                       VerticalOptions="Center"/>
+                                <Label Text="{Binding UsageCount, StringFormat='({0} uses)'}" 
+                                       FontSize="Micro"
+                                       TextColor="LightGray"
+                                       VerticalOptions="Center"/>
+                            </StackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Frame>
+        
+        <!-- Variable insertion hint -->
+        <Label x:Name="HintLabel"
+               Text="Type {{ to see available variables"
+               FontSize="Micro"
+               TextColor="Gray"
+               IsVisible="False"
+               Margin="5,2,0,0"/>
+    </StackLayout>
+    
+</ContentView>

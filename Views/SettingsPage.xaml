@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="PosterFly.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Settings">
+    
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+            
+            <!-- App Info -->
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="About Poster Fly" FontSize="Large" FontAttributes="Bold"/>
+                    <Label Text="Version 1.0.0" FontSize="Medium" TextColor="Gray"/>
+                    <Label Text="A powerful API testing tool for HTTP, gRPC, and GraphQL requests" 
+                           FontSize="Small" TextColor="Gray" LineBreakMode="WordWrap"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Request Settings -->
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Request Settings" FontSize="Large" FontAttributes="Bold"/>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Default Timeout (seconds):" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Entry Text="{Binding DefaultTimeoutSeconds}" 
+                               Keyboard="Numeric" 
+                               WidthRequest="80" 
+                               HorizontalTextAlignment="Center"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Follow Redirects:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Switch IsToggled="{Binding FollowRedirects}"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Verify SSL Certificates:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Switch IsToggled="{Binding VerifySSL}"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Default HTTP Version:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Picker ItemsSource="{Binding HttpVersions}" 
+                                SelectedItem="{Binding DefaultHttpVersion}"
+                                WidthRequest="120"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Storage Settings -->
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Storage Settings" FontSize="Large" FontAttributes="Bold"/>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Keep History (days):" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Entry Text="{Binding HistoryRetentionDays}" 
+                               Keyboard="Numeric" 
+                               WidthRequest="80" 
+                               HorizontalTextAlignment="Center"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Auto-save Requests:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Switch IsToggled="{Binding AutoSaveRequests}"/>
+                    </StackLayout>
+                    
+                    <Button Text="Export All Data" 
+                            Command="{Binding ExportAllDataCommand}"
+                            BackgroundColor="Blue" 
+                            TextColor="White"/>
+                    
+                    <Button Text="Import Data" 
+                            Command="{Binding ImportDataCommand}"
+                            BackgroundColor="Green" 
+                            TextColor="White"/>
+                    
+                    <Button Text="Clear All Data" 
+                            Command="{Binding ClearAllDataCommand}"
+                            BackgroundColor="Red" 
+                            TextColor="White"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- UI Settings -->
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Interface Settings" FontSize="Large" FontAttributes="Bold"/>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Theme:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Picker ItemsSource="{Binding Themes}" 
+                                SelectedItem="{Binding SelectedTheme}"
+                                WidthRequest="120"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Font Size:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Picker ItemsSource="{Binding FontSizes}" 
+                                SelectedItem="{Binding SelectedFontSize}"
+                                WidthRequest="120"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Show Response Time:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Switch IsToggled="{Binding ShowResponseTime}"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Pretty Print JSON:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Switch IsToggled="{Binding PrettyPrintJson}"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Advanced Settings -->
+            <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Advanced Settings" FontSize="Large" FontAttributes="Bold"/>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Max Response Size (MB):" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Entry Text="{Binding MaxResponseSizeMB}" 
+                               Keyboard="Numeric" 
+                               WidthRequest="80" 
+                               HorizontalTextAlignment="Center"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Proxy Host:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Entry Text="{Binding ProxyHost}" 
+                               Placeholder="proxy.company.com"
+                               WidthRequest="200"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Proxy Port:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Entry Text="{Binding ProxyPort}" 
+                               Keyboard="Numeric" 
+                               WidthRequest="80" 
+                               HorizontalTextAlignment="Center"/>
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Use Proxy Authentication:" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                        <Switch IsToggled="{Binding UseProxyAuth}"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <StackLayout Spacing="10">
+                <Button Text="Save Settings" 
+                        Command="{Binding SaveSettingsCommand}"
+                        BackgroundColor="Green" 
+                        TextColor="White"/>
+                
+                <Button Text="Reset to Defaults" 
+                        Command="{Binding ResetSettingsCommand}"
+                        BackgroundColor="Orange" 
+                        TextColor="White"/>
+            </StackLayout>
+            
+        </StackLayout>
+    </ScrollView>
+    
+</ContentPage>

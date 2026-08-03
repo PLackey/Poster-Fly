@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="PosterFly.Views.VariablesPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Variables & Environments">
+    
+    <StackLayout Padding="20" Spacing="15">
+        
+        <!-- Environment Selection -->
+        <Frame BackgroundColor="LightBlue" Padding="15" CornerRadius="8" HasShadow="True">
+            <StackLayout Spacing="10">
+                <Label Text="Active Environment" FontSize="Medium" FontAttributes="Bold"/>
+                <StackLayout Orientation="Horizontal" Spacing="10">
+                    <Picker ItemsSource="{Binding Environments}"
+                            DisplayMemberPath="Name"
+                            SelectedItem="{Binding ActiveEnvironment}"
+                            HorizontalOptions="FillAndExpand"/>
+                    <Button Text="+" 
+                            Command="{Binding NewEnvironmentCommand}"
+                            BackgroundColor="Green" 
+                            TextColor="White"
+                            WidthRequest="40"/>
+                    <Button Text="Manage" 
+                            Command="{Binding ManageEnvironmentsCommand}"
+                            BackgroundColor="Orange" 
+                            TextColor="White"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+
+        <!-- Tabs for Global vs Environment Variables -->
+        <StackLayout Orientation="Horizontal" Spacing="5">
+            <Button Text="Global Variables" 
+                    Command="{Binding ShowGlobalVariablesCommand}"
+                    BackgroundColor="{Binding ShowingGlobal, Converter={StaticResource BoolToColorConverter}}"
+                    TextColor="White"
+                    HorizontalOptions="FillAndExpand"/>
+            <Button Text="Environment Variables" 
+                    Command="{Binding ShowEnvironmentVariablesCommand}"
+                    BackgroundColor="{Binding ShowingEnvironment, Converter={StaticResource BoolToColorConverter}}"
+                    TextColor="White"
+                    HorizontalOptions="FillAndExpand"/>
+            <Button Text="Most Used" 
+                    Command="{Binding ShowMostUsedCommand}"
+                    BackgroundColor="{Binding ShowingMostUsed, Converter={StaticResource BoolToColorConverter}}"
+                    TextColor="White"
+                    HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        <!-- Search Bar -->
+        <SearchBar x:Name="VariableSearchBar"
+                   Text="{Binding SearchText}"
+                   Placeholder="Search variables..."
+                   SearchCommand="{Binding SearchCommand}"/>
+
+        <!-- Add Variable Section -->
+        <Frame BackgroundColor="White" Padding="15" CornerRadius="8" HasShadow="True">
+            <StackLayout Spacing="10">
+                <Label Text="Add New Variable" FontSize="Medium" FontAttributes="Bold"/>
+                
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                    
+                    <Entry Grid.Row="0" Grid.Column="0"
+                           Text="{Binding NewVariableName}"
+                           Placeholder="Variable name (e.g., baseUrl)"/>
+                    
+                    <Entry Grid.Row="0" Grid.Column="1"
+                           Text="{Binding NewVariableValue}"
+                           Placeholder="Variable value"/>
+                    
+                    <Entry Grid.Row="1" Grid.ColumnSpan="2"
+                           Text="{Binding NewVariableDescription}"
+                           Placeholder="Description (optional)"/>
+                    
+                    <Picker Grid.Row="2" Grid.Column="0"
+                            ItemsSource="{Binding VariableScopes}"
+                            SelectedItem="{Binding NewVariableScope}"
+                            Title="Scope"/>
+                    
+                    <StackLayout Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                        <CheckBox IsChecked="{Binding NewVariableIsSecret}"/>
+                        <Label Text="Is Secret" VerticalOptions="Center"/>
+                    </StackLayout>
+                    
+                    <Button Grid.Row="3" Grid.ColumnSpan="2"
+                            Text="Add Variable"
+                            Command="{Binding AddVariableCommand}"
+                            BackgroundColor="Green"
+                            TextColor="White"/>
+                </Grid>
+            </StackLayout>
+        </Frame>
+
+        <!-- Variables List -->
+        <CollectionView ItemsSource="{Binding FilteredVariables}" x:Name="VariablesListView">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="White" Padding="15" Margin="0,5" CornerRadius="8" HasShadow="True">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                            
+                            <!-- Variable Name and Value -->
+                            <StackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <Label Text="{Binding Name}" 
+                                           FontSize="Medium" 
+                                           FontAttributes="Bold"/>
+                                    
+                                    <Frame BackgroundColor="{Binding Scope, Converter={StaticResource ScopeToColorConverter}}"
+                                           Padding="5,2" CornerRadius="10" HasShadow="False">
+                                        <Label Text="{Binding Scope}" 
+                                               TextColor="White" 
+                                               FontSize="Micro"/>
+                                    </Frame>
+                                    
+                                    <Frame BackgroundColor="Red" 
+                                           Padding="5,2" CornerRadius="10" HasShadow="False"
+                                           IsVisible="{Binding IsSecret}">
+                                        <Label Text="SECRET" 
+                                               TextColor="White" 
+                                               FontSize="Micro"/>
+                                    </Frame>
+                                </StackLayout>
+                                
+                                <Label Text="{Binding Value, Converter={StaticResource SecretValueConverter}}" 
+                                       FontSize="Small" 
+                                       TextColor="DarkBlue"
+                                       FontFamily="Courier"/>
+                            </StackLayout>
+                            
+                            <!-- Action Buttons -->
+                            <StackLayout Grid.Row="0" Grid.Column="1" 
+                                         Orientation="Horizontal" Spacing="5">
+                                <Button Text="Copy" 
+                                        Command="{Binding Source={x:Reference VariablesListView}, Path=BindingContext.CopyVariableCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="Blue" 
+                                        TextColor="White"
+                                        FontSize="Small"
+                                        WidthRequest="60"/>
+                                <Button Text="Edit" 
+                                        Command="{Binding Source={x:Reference VariablesListView}, Path=BindingContext.EditVariableCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="Orange" 
+                                        TextColor="White"
+                                        FontSize="Small"
+                                        WidthRequest="60"/>
+                                <Button Text="Delete" 
+                                        Command="{Binding Source={x:Reference VariablesListView}, Path=BindingContext.DeleteVariableCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="Red" 
+                                        TextColor="White"
+                                        FontSize="Small"
+                                        WidthRequest="60"/>
+                            </StackLayout>
+                            
+                            <!-- Description -->
+                            <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                   Text="{Binding Description}" 
+                                   FontSize="Small" 
+                                   TextColor="Gray"
+                                   IsVisible="{Binding Description, Converter={StaticResource StringToBoolConverter}}"
+                                   Margin="0,5,0,0"/>
+                            
+                            <!-- Usage Stats -->
+                            <StackLayout Grid.Row="2" Grid.ColumnSpan="2"
+                                         Orientation="Horizontal" Spacing="20" Margin="0,5,0,0">
+                                <Label Text="{Binding UsageCount, StringFormat='Used: {0} times'}" 
+                                       FontSize="Micro" 
+                                       TextColor="Gray"/>
+                                <Label Text="{Binding LastUsed, StringFormat='Last used: {0:MMM dd, HH:mm}'}" 
+                                       FontSize="Micro" 
+                                       TextColor="Gray"/>
+                            </StackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
+        <!-- Empty State -->
+        <StackLayout IsVisible="{Binding HasNoVariables}" VerticalOptions="CenterAndExpand">
+            <Label Text="No variables yet" 
+                   FontSize="Large" 
+                   HorizontalOptions="Center" 
+                   TextColor="Gray"/>
+            <Label Text="Create variables to reuse values across your requests" 
+                   FontSize="Medium" 
+                   HorizontalOptions="Center" 
+                   TextColor="Gray"
+                   Margin="20"/>
+        </StackLayout>
+        
+    </StackLayout>
+    
+</ContentPage>

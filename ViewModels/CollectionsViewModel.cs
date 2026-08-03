@@ -1,0 +1,245 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using Microsoft.Extensions.Logging;
+using PosterFly.Models;
+using PosterFly.Services;
+
+namespace PosterFly.ViewModels;
+
+public class CollectionsViewModel : INotifyPropertyChanged
+{
+    private readonly IStorageService _storageService;
+    private readonly ILogger<CollectionsViewModel> _logger;
+    
+    private ObservableCollection<Collection> _collections = new();
+    private bool _isLoading;
+
+    public CollectionsViewModel(IStorageService storageService, ILogger<CollectionsViewModel> logger)
+    {
+        _storageService = storageService;
+        _logger = logger;
+        
+        NewCollectionCommand = new Command(async () => await CreateNewCollectionAsync());
+        OpenCollectionCommand = new Command<Collection>(async (collection) => await OpenCollectionAsync(collection));
+        DeleteCollectionCommand = new Command<Collection>(async (collection) => await DeleteCollectionAsync(collection));
+        ExportCollectionCommand = new Command<Collection>(async (collection) => await ExportCollectionAsync(collection));
+        ImportCollectionCommand = new Command(async () => await ImportCollectionAsync());
+        
+        LoadCollectionsAsync();
+    }
+
+    public ObservableCollection<Collection> Collections
+    {
+        get => _collections;
+        set
+        {
+            _collections = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasNoCollections));
+        }
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            _isLoading = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool HasNoCollections => !Collections.Any();
+
+    public ICommand NewCollectionCommand { get; }
+    public ICommand OpenCollectionCommand { get; }
+    public ICommand DeleteCollectionCommand { get; }
+    public ICommand ExportCollectionCommand { get; }
+    public ICommand ImportCollectionCommand { get; }
+
+    private async Task LoadCollectionsAsync()
+    {
+        try
+        {
+            IsLoading = true;
+            var collections = await _storageService.LoadCollectionsAsync();
+            Collections.Clear();
+            foreach (var collection in collections.OrderBy(c => c.Name))
+            {
+                Collections.Add(collection);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading collections");
+            await Application.Current.MainPage.DisplayAlert("Error", "Failed to load collections", "OK");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task CreateNewCollectionAsync()
+    {
+        var name = await Application.Current.MainPage.DisplayPromptAsync(
+            "New Collection",
+            "Enter collection name:",
+            "Create",
+            "Cancel",
+            "My Collection");
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            var description = await Application.Current.MainPage.DisplayPromptAsync(
+                "Collection Description",
+                "Enter description (optional):",
+                "Create",
+                "Skip",
+                "");
+
+            try
+            {
+                var collection = new Collection
+                {
+                    Name = name,
+                    Description = string.IsNullOrWhiteSpace(description) ? null : description
+                };
+
+                await _storageService.SaveCollectionAsync(collection);
+                Collections.Add(collection);
+                OnPropertyChanged(nameof(HasNoCollections));
+
+                await Application.Current.MainPage.DisplayAlert("Success", "Collection created successfully!", "OK");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating collection");
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to create collection", "OK");
+            }
+        }
+    }
+
+    private async Task OpenCollectionAsync(Collection collection)
+    {
+        if (collection == null) return;
+
+        // Navigate to collection detail page
+        // For now, just show the requests count
+        var requestCount = collection.Requests.Count;
+        var folderCount = collection.Folders.Count;
+        
+        await Application.Current.MainPage.DisplayAlert(
+            collection.Name,
+            $"Requests: {requestCount}\nFolders: {folderCount}\n\nCollection details view would open here.",
+            "OK");
+    }
+
+    private async Task DeleteCollectionAsync(Collection collection)
+    {
+        if (collection == null) return;
+
+        var confirm = await Application.Current.MainPage.DisplayAlert(
+            "Delete Collection",
+            $"Are you sure you want to delete '{collection.Name}'? This action cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirm)
+        {
+            try
+            {
+                await _storageService.DeleteCollectionAsync(collection.Id);
+                Collections.Remove(collection);
+                OnPropertyChanged(nameof(HasNoCollections));
+
+                await Application.Current.MainPage.DisplayAlert("Success", "Collection deleted successfully!", "OK");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting collection");
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to delete collection", "OK");
+            }
+        }
+    }
+
+    private async Task ExportCollectionAsync(Collection collection)
+    {
+        if (collection == null) return;
+
+        var format = await Application.Current.MainPage.DisplayActionSheet(
+            "Export Format",
+            "Cancel",
+            null,
+            "JSON",
+            "Postman");
+
+        if (format != "Cancel" && format != null)
+        {
+            try
+            {
+                var exportData = await _storageService.ExportCollectionAsync(collection, format.ToLower());
+                
+                // In a real app, you'd use the file picker or share dialog
+                // For now, just show a preview
+                await Application.Current.MainPage.DisplayAlert(
+                    "Export Ready",
+                    $"Collection exported as {format}.\n\nPreview (first 200 chars):\n{exportData.Substring(0, Math.Min(200, exportData.Length))}...",
+                    "OK");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting collection");
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to export collection", "OK");
+            }
+        }
+    }
+
+    private async Task ImportCollectionAsync()
+    {
+        // In a real app, you'd use a file picker
+        // For now, let user paste JSON
+        var jsonData = await Application.Current.MainPage.DisplayPromptAsync(
+            "Import Collection",
+            "Paste collection JSON data:",
+            "Import",
+            "Cancel",
+            "",
+            -1,
+            Keyboard.Default);
+
+        if (!string.IsNullOrWhiteSpace(jsonData))
+        {
+            try
+            {
+                var collection = await _storageService.ImportCollectionAsync(jsonData);
+                if (collection != null)
+                {
+                    await _storageService.SaveCollectionAsync(collection);
+                    Collections.Add(collection);
+                    OnPropertyChanged(nameof(HasNoCollections));
+
+                    await Application.Current.MainPage.DisplayAlert("Success", "Collection imported successfully!", "OK");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Error", "Invalid collection data", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error importing collection");
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to import collection", "OK");
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

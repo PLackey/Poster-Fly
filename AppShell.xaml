@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="PosterFly.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:PosterFly.Views"
+    Title="Poster Fly">
+
+    <TabBar>
+        <ShellContent
+            Title="Requests"
+            Icon="play_arrow.png"
+            ContentTemplate="{DataTemplate local:RequestsPage}"
+            Route="RequestsPage" />
+        
+        <ShellContent
+            Title="Collections"
+            Icon="folder.png"
+            ContentTemplate="{DataTemplate local:CollectionsPage}"
+            Route="CollectionsPage" />
+        
+        <ShellContent
+            Title="History"
+            Icon="history.png"
+            ContentTemplate="{DataTemplate local:HistoryPage}"
+            Route="HistoryPage" />
+        
+        <ShellContent
+            Title="Variables"
+            Icon="code.png"
+            ContentTemplate="{DataTemplate local:VariablesPage}"
+            Route="VariablesPage" />
+        
+        <ShellContent
+            Title="Settings"
+            Icon="settings.png"
+            ContentTemplate="{DataTemplate local:SettingsPage}"
+            Route="SettingsPage" />
+    </TabBar>
+
+</Shell>
