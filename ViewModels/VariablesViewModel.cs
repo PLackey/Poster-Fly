@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.Extensions.Logging;
 using PosterFly.Models;
 using PosterFly.Services;
+using Environment = PosterFly.Models.Environment;
 
 namespace PosterFly.ViewModels;
 
@@ -51,7 +52,8 @@ public class VariablesViewModel : INotifyPropertyChanged
         NewEnvironmentCommand = new Command(async () => await CreateEnvironmentAsync());
         ManageEnvironmentsCommand = new Command(async () => await ManageEnvironmentsAsync());
         
-        LoadDataAsync();
+        // Fire and forget - we want this to run in the background
+        _ = Task.Run(async () => await LoadDataAsync());
     }
 
     // Properties
@@ -183,7 +185,7 @@ public class VariablesViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading variables data");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to load variables", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to load variables", "OK");
         }
         finally
         {
@@ -223,12 +225,12 @@ public class VariablesViewModel : INotifyPropertyChanged
             NewVariableIsSecret = false;
 
             await RefreshCurrentView();
-            await Application.Current.MainPage.DisplayAlert("Success", "Variable added successfully!", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Success", "Variable added successfully!", "OK");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error adding variable");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to add variable", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to add variable", "OK");
         }
     }
 
@@ -236,7 +238,7 @@ public class VariablesViewModel : INotifyPropertyChanged
     {
         if (variable == null) return;
 
-        var name = await Application.Current.MainPage.DisplayPromptAsync(
+        var name = await Application.Current?.MainPage?.DisplayPromptAsync(
             "Edit Variable",
             "Enter new name:",
             "Save",
@@ -245,7 +247,7 @@ public class VariablesViewModel : INotifyPropertyChanged
 
         if (!string.IsNullOrWhiteSpace(name) && name != variable.Name)
         {
-            var value = await Application.Current.MainPage.DisplayPromptAsync(
+            var value = await Application.Current?.MainPage?.DisplayPromptAsync(
                 "Edit Variable",
                 "Enter new value:",
                 "Save",
@@ -261,12 +263,12 @@ public class VariablesViewModel : INotifyPropertyChanged
                     await _variableService.SaveVariableAsync(variable);
                     
                     await RefreshCurrentView();
-                    await Application.Current.MainPage.DisplayAlert("Success", "Variable updated successfully!", "OK");
+                    await Application.Current?.MainPage?.DisplayAlert("Success", "Variable updated successfully!", "OK");
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error updating variable");
-                    await Application.Current.MainPage.DisplayAlert("Error", "Failed to update variable", "OK");
+                    await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to update variable", "OK");
                 }
             }
         }
@@ -275,6 +277,7 @@ public class VariablesViewModel : INotifyPropertyChanged
     private async Task DeleteVariableAsync(Variable variable)
     {
         if (variable == null) return;
+        if (Application.Current?.MainPage == null) return;
 
         var confirm = await Application.Current.MainPage.DisplayAlert(
             "Delete Variable",
@@ -290,12 +293,12 @@ public class VariablesViewModel : INotifyPropertyChanged
                 _allVariables.Remove(variable);
                 FilteredVariables.Remove(variable);
                 
-                await Application.Current.MainPage.DisplayAlert("Success", "Variable deleted successfully!", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Success", "Variable deleted successfully!", "OK");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting variable");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to delete variable", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to delete variable", "OK");
             }
         }
     }
@@ -308,12 +311,12 @@ public class VariablesViewModel : INotifyPropertyChanged
         {
             var variableReference = $"{{{{{variable.Name}}}}}";
             await Clipboard.SetTextAsync(variableReference);
-            await Application.Current.MainPage.DisplayAlert("Copied", $"Variable reference copied: {variableReference}", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Copied", $"Variable reference copied: {variableReference}", "OK");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error copying variable");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to copy variable", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to copy variable", "OK");
         }
     }
 
@@ -340,7 +343,7 @@ public class VariablesViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task ShowGlobalVariablesAsync()
+    private Task ShowGlobalVariablesAsync()
     {
         ShowingGlobal = true;
         ShowingEnvironment = false;
@@ -351,9 +354,11 @@ public class VariablesViewModel : INotifyPropertyChanged
         {
             FilteredVariables.Add(variable);
         }
+        
+        return Task.CompletedTask;
     }
 
-    private async Task ShowEnvironmentVariablesAsync()
+    private Task ShowEnvironmentVariablesAsync()
     {
         ShowingGlobal = false;
         ShowingEnvironment = true;
@@ -367,6 +372,8 @@ public class VariablesViewModel : INotifyPropertyChanged
                 FilteredVariables.Add(variable);
             }
         }
+        
+        return Task.CompletedTask;
     }
 
     private async Task ShowMostUsedAsync()
@@ -402,7 +409,7 @@ public class VariablesViewModel : INotifyPropertyChanged
 
     private async Task CreateEnvironmentAsync()
     {
-        var name = await Application.Current.MainPage.DisplayPromptAsync(
+        var name = await Application.Current?.MainPage?.DisplayPromptAsync(
             "New Environment",
             "Enter environment name:",
             "Create",
@@ -421,19 +428,19 @@ public class VariablesViewModel : INotifyPropertyChanged
                 await _variableService.SaveEnvironmentAsync(environment);
                 Environments.Add(environment);
                 
-                await Application.Current.MainPage.DisplayAlert("Success", "Environment created successfully!", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Success", "Environment created successfully!", "OK");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating environment");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to create environment", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to create environment", "OK");
             }
         }
     }
 
     private async Task ManageEnvironmentsAsync()
     {
-        await Application.Current.MainPage.DisplayAlert(
+        await Application.Current?.MainPage?.DisplayAlert(
             "Manage Environments", 
             "Environment management UI would be implemented here.\n\nFeatures:\n- Rename environments\n- Delete environments\n- Duplicate environments\n- Import/Export environments", 
             "OK");

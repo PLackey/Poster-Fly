@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using PosterFly.Models;
 
 namespace PosterFly.Services;
@@ -18,7 +19,7 @@ public class StorageService : IStorageService
     public StorageService(ILogger<StorageService> logger)
     {
         _logger = logger;
-        var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PosterFly");
+        var appDataPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "PosterFly");
         Directory.CreateDirectory(appDataPath);
         
         _collectionsPath = Path.Combine(appDataPath, "collections");
@@ -69,7 +70,7 @@ public class StorageService : IStorageService
         }
     }
 
-    public async Task DeleteCollectionAsync(Guid collectionId)
+    public Task DeleteCollectionAsync(Guid collectionId)
     {
         try
         {
@@ -83,6 +84,8 @@ public class StorageService : IStorageService
             _logger.LogError(ex, "Error deleting collection {CollectionId}", collectionId);
             throw;
         }
+        
+        return Task.CompletedTask;
     }
 
     public async Task<string> ExportCollectionAsync(Collection collection, string format = "json")
@@ -514,7 +517,7 @@ public class StorageService : IStorageService
             // Parse method
             if (req.TryGetProperty("method", out var method))
             {
-                if (Enum.TryParse<HttpMethod>(method.GetString(), true, out var httpMethod))
+                if (Enum.TryParse<PosterFly.Models.HttpMethod>(method.GetString(), true, out var httpMethod))
                     request.Method = httpMethod;
             }
 
@@ -628,10 +631,13 @@ public class StorageService : IStorageService
             type = "string"
         }).ToArray();
 
-        return new
+        return authType switch
         {
-            type = authType,
-            [authType] = authData
+            "bearer" => new { type = authType, bearer = authData },
+            "basic" => new { type = authType, basic = authData },
+            "apikey" => new { type = authType, apikey = authData },
+            "oauth2" => new { type = authType, oauth2 = authData },
+            _ => new { type = authType, custom = authData }
         };
     }
 }

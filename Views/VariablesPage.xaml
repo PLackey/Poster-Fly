@@ -2,7 +2,7 @@
 <ContentPage x:Class="PosterFly.Views.VariablesPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Variables & Environments">
+             Title="Variables and Environments">
     
     <StackLayout Padding="20" Spacing="15">
         
@@ -12,7 +12,7 @@
                 <Label Text="Active Environment" FontSize="Medium" FontAttributes="Bold"/>
                 <StackLayout Orientation="Horizontal" Spacing="10">
                     <Picker ItemsSource="{Binding Environments}"
-                            DisplayMemberPath="Name"
+                            ItemDisplayBinding="{Binding Name}"
                             SelectedItem="{Binding ActiveEnvironment}"
                             HorizontalOptions="FillAndExpand"/>
                     <Button Text="+" 

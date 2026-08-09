@@ -6,6 +6,7 @@ using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Logging;
 using PosterFly.Models;
 using HttpMethod = PosterFly.Models.HttpMethod;
 
@@ -138,7 +139,7 @@ public class ApiService : IApiService
         return response;
     }
 
-    public async Task<ApiResponse> SendGrpcRequestAsync(ApiRequest request, CancellationToken cancellationToken = default)
+    public Task<ApiResponse> SendGrpcRequestAsync(ApiRequest request, CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var response = new ApiResponse { RequestId = request.Id };
@@ -169,7 +170,7 @@ public class ApiService : IApiService
             _logger.LogError(ex, "Error sending gRPC request to {Url}", request.Url);
         }
 
-        return response;
+        return Task.FromResult(response);
     }
 
     public async Task<bool> TestConnectionAsync(string url, CancellationToken cancellationToken = default)

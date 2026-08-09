@@ -18,8 +18,8 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		// Register HttpClient
-		builder.Services.AddHttpClient();
+		// Register HttpClient - alternative approach for MAUI
+		builder.Services.AddSingleton<HttpClient>();
 
 		// Register Services
 		builder.Services.AddSingleton<IApiService, ApiService>();
@@ -27,16 +27,16 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IVariableService, VariableService>();
 
 		// Register ViewModels
-		builder.Services.AddTransient<RequestsViewModel>();
 		builder.Services.AddTransient<CollectionsViewModel>();
 		builder.Services.AddTransient<HistoryViewModel>();
+		builder.Services.AddTransient<RequestsViewModel>();
 		builder.Services.AddTransient<SettingsViewModel>();
 		builder.Services.AddTransient<VariablesViewModel>();
 
 		// Register Views
-		builder.Services.AddTransient<RequestsPage>();
 		builder.Services.AddTransient<CollectionsPage>();
 		builder.Services.AddTransient<HistoryPage>();
+		builder.Services.AddTransient<RequestsPage>();
 		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<VariablesPage>();
 

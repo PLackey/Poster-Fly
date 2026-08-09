@@ -2,7 +2,6 @@
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:PosterFly"
-             xmlns:converters="clr-namespace:PosterFly.Converters"
              x:Class="PosterFly.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -10,14 +9,6 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
-            <!-- Value Converters -->
-            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
-            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
-            <converters:HttpMethodToColorConverter x:Key="HttpMethodToColorConverter" />
-            <converters:RequestTypeToColorConverter x:Key="RequestTypeToColorConverter" />
-            <converters:ScopeToColorConverter x:Key="ScopeToColorConverter" />
-            <converters:SecretValueConverter x:Key="SecretValueConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

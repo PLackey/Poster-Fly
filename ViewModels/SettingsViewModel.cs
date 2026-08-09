@@ -156,18 +156,20 @@ public class SettingsViewModel : INotifyPropertyChanged
         try
         {
             // In a real app, save to preferences/settings storage
-            await Application.Current.MainPage.DisplayAlert("Success", "Settings saved successfully!", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Success", "Settings saved successfully!", "OK");
             _logger.LogInformation("Settings saved");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error saving settings");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to save settings", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to save settings", "OK");
         }
     }
 
     private async Task ResetSettingsAsync()
     {
+        if (Application.Current?.MainPage == null) return;
+        
         var confirm = await Application.Current.MainPage.DisplayAlert(
             "Reset Settings",
             "Are you sure you want to reset all settings to their default values?",
@@ -194,13 +196,13 @@ public class SettingsViewModel : INotifyPropertyChanged
                 ProxyPort = 8080;
                 UseProxyAuth = false;
 
-                await Application.Current.MainPage.DisplayAlert("Success", "Settings reset to defaults!", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Success", "Settings reset to defaults!", "OK");
                 _logger.LogInformation("Settings reset to defaults");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error resetting settings");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to reset settings", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to reset settings", "OK");
             }
         }
     }
@@ -209,7 +211,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     {
         try
         {
-            await Application.Current.MainPage.DisplayAlert(
+            await Application.Current?.MainPage?.DisplayAlert(
                 "Export All Data",
                 "This would export all collections, requests, history, and settings to a file.\n\nFeature would be implemented with file picker integration.",
                 "OK");
@@ -219,7 +221,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error exporting data");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to export data", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to export data", "OK");
         }
     }
 
@@ -227,7 +229,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     {
         try
         {
-            await Application.Current.MainPage.DisplayAlert(
+            await Application.Current?.MainPage?.DisplayAlert(
                 "Import Data",
                 "This would import collections, requests, and settings from a file.\n\nFeature would be implemented with file picker integration.",
                 "OK");
@@ -237,12 +239,14 @@ public class SettingsViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error importing data");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to import data", "OK");
+            await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to import data", "OK");
         }
     }
 
     private async Task ClearAllDataAsync()
     {
+        if (Application.Current?.MainPage == null) return;
+        
         var confirm = await Application.Current.MainPage.DisplayAlert(
             "Clear All Data",
             "Are you sure you want to delete all collections, requests, and history? This action cannot be undone.",
@@ -254,13 +258,13 @@ public class SettingsViewModel : INotifyPropertyChanged
             try
             {
                 // In a real app, clear all stored data
-                await Application.Current.MainPage.DisplayAlert("Success", "All data cleared successfully!", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Success", "All data cleared successfully!", "OK");
                 _logger.LogInformation("All data cleared");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error clearing data");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to clear data", "OK");
+                await Application.Current?.MainPage?.DisplayAlert("Error", "Failed to clear data", "OK");
             }
         }
     }

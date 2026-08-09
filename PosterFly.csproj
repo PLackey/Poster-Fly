@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android</TargetFrameworks>
-		<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('linux'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst;net10.0-windows10.0.19041.0</TargetFrameworks>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -39,12 +37,35 @@
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<UseWinUIHostingForWinFormsAndWpf>false</UseWinUIHostingForWinFormsAndWpf>
+		
+		<!-- Generate app package on build for debugging -->
+		<GenerateAppInstallerFile Condition="'$(Configuration)' == 'Debug'">False</GenerateAppInstallerFile>
+		<AppxPackageSigningEnabled Condition="'$(Configuration)' == 'Debug'">False</AppxPackageSigningEnabled>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		
+		<!-- Suppress common nullable warnings -->
+		<WarningsNotAsErrors>CS8602;CS8604;CS8618;CS2002</WarningsNotAsErrors>
+		<NoWarn>CS8602;CS8604;CS8618;CS2002</NoWarn>
+	</PropertyGroup>
+
+	<!-- Windows-specific configuration -->
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<UseWinUI>true</UseWinUI>
+		<EnableMsixTooling>true</EnableMsixTooling>
+		<PublishSingleFile>false</PublishSingleFile>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<DefaultLanguage>en</DefaultLanguage>
+		<!-- Enable manifest generation with custom manifest -->
+		<GenerateAppxManifest>true</GenerateAppxManifest>
+		<GenerateAppInstallerFile>false</GenerateAppInstallerFile>
+		<GenerateAppManifestFromAppx>true</GenerateAppManifestFromAppx>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -67,18 +88,19 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		
 		<!-- HTTP and REST -->
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
 		
 		<!-- gRPC -->
-		<PackageReference Include="Grpc.Net.Client" Version="2.65.0" />
-		<PackageReference Include="Grpc.Tools" Version="2.65.0">
+		<PackageReference Include="Grpc.Net.Client" Version="2.70.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.68.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Google.Protobuf" Version="3.27.3" />
+		<PackageReference Include="Google.Protobuf" Version="3.28.2" />
 		
 		<!-- GraphQL -->
 		<PackageReference Include="GraphQL.Client" Version="6.0.2" />
@@ -86,6 +108,12 @@
 		
 		<!-- Additional utilities -->
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+	</ItemGroup>
+
+	<!-- Windows-specific packages -->
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<!-- Windows App SDK for unpackaged deployment -->
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250909003" />
 	</ItemGroup>
 
 </Project>

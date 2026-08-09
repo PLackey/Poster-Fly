@@ -27,7 +27,8 @@ public class CollectionsViewModel : INotifyPropertyChanged
         ExportCollectionCommand = new Command<Collection>(async (collection) => await ExportCollectionAsync(collection));
         ImportCollectionCommand = new Command(async () => await ImportCollectionAsync());
         
-        LoadCollectionsAsync();
+        // Fire and forget - we want this to run in the background
+        _ = Task.Run(async () => await LoadCollectionsAsync());
     }
 
     public ObservableCollection<Collection> Collections
@@ -74,7 +75,9 @@ public class CollectionsViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading collections");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to load collections", "OK");
+            var mainPage = Application.Current?.MainPage;
+            if (mainPage != null)
+                await mainPage.DisplayAlert("Error", "Failed to load collections", "OK");
         }
         finally
         {
@@ -84,7 +87,10 @@ public class CollectionsViewModel : INotifyPropertyChanged
 
     private async Task CreateNewCollectionAsync()
     {
-        var name = await Application.Current.MainPage.DisplayPromptAsync(
+        var mainPage = Application.Current?.MainPage;
+        if (mainPage == null) return;
+
+        var name = await mainPage.DisplayPromptAsync(
             "New Collection",
             "Enter collection name:",
             "Create",
@@ -93,7 +99,7 @@ public class CollectionsViewModel : INotifyPropertyChanged
 
         if (!string.IsNullOrWhiteSpace(name))
         {
-            var description = await Application.Current.MainPage.DisplayPromptAsync(
+            var description = await mainPage.DisplayPromptAsync(
                 "Collection Description",
                 "Enter description (optional):",
                 "Create",
@@ -112,36 +118,42 @@ public class CollectionsViewModel : INotifyPropertyChanged
                 Collections.Add(collection);
                 OnPropertyChanged(nameof(HasNoCollections));
 
-                await Application.Current.MainPage.DisplayAlert("Success", "Collection created successfully!", "OK");
+                await mainPage.DisplayAlert("Success", "Collection created successfully!", "OK");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating collection");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to create collection", "OK");
+                await mainPage.DisplayAlert("Error", "Failed to create collection", "OK");
             }
         }
     }
 
-    private async Task OpenCollectionAsync(Collection collection)
+    private async Task OpenCollectionAsync(Collection? collection)
     {
         if (collection == null) return;
+        
+        var mainPage = Application.Current?.MainPage;
+        if (mainPage == null) return;
 
         // Navigate to collection detail page
         // For now, just show the requests count
-        var requestCount = collection.Requests.Count;
-        var folderCount = collection.Folders.Count;
+        var requestCount = collection.Requests?.Count ?? 0;
+        var folderCount = collection.Folders?.Count ?? 0;
         
-        await Application.Current.MainPage.DisplayAlert(
+        await mainPage.DisplayAlert(
             collection.Name,
             $"Requests: {requestCount}\nFolders: {folderCount}\n\nCollection details view would open here.",
             "OK");
     }
 
-    private async Task DeleteCollectionAsync(Collection collection)
+    private async Task DeleteCollectionAsync(Collection? collection)
     {
         if (collection == null) return;
+        
+        var mainPage = Application.Current?.MainPage;
+        if (mainPage == null) return;
 
-        var confirm = await Application.Current.MainPage.DisplayAlert(
+        var confirm = await mainPage.DisplayAlert(
             "Delete Collection",
             $"Are you sure you want to delete '{collection.Name}'? This action cannot be undone.",
             "Delete",
@@ -155,21 +167,24 @@ public class CollectionsViewModel : INotifyPropertyChanged
                 Collections.Remove(collection);
                 OnPropertyChanged(nameof(HasNoCollections));
 
-                await Application.Current.MainPage.DisplayAlert("Success", "Collection deleted successfully!", "OK");
+                await mainPage.DisplayAlert("Success", "Collection deleted successfully!", "OK");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting collection");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to delete collection", "OK");
+                await mainPage.DisplayAlert("Error", "Failed to delete collection", "OK");
             }
         }
     }
 
-    private async Task ExportCollectionAsync(Collection collection)
+    private async Task ExportCollectionAsync(Collection? collection)
     {
         if (collection == null) return;
+        
+        var mainPage = Application.Current?.MainPage;
+        if (mainPage == null) return;
 
-        var format = await Application.Current.MainPage.DisplayActionSheet(
+        var format = await mainPage.DisplayActionSheet(
             "Export Format",
             "Cancel",
             null,
@@ -184,7 +199,7 @@ public class CollectionsViewModel : INotifyPropertyChanged
                 
                 // In a real app, you'd use the file picker or share dialog
                 // For now, just show a preview
-                await Application.Current.MainPage.DisplayAlert(
+                await mainPage.DisplayAlert(
                     "Export Ready",
                     $"Collection exported as {format}.\n\nPreview (first 200 chars):\n{exportData.Substring(0, Math.Min(200, exportData.Length))}...",
                     "OK");
@@ -192,23 +207,26 @@ public class CollectionsViewModel : INotifyPropertyChanged
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting collection");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to export collection", "OK");
+                await mainPage.DisplayAlert("Error", "Failed to export collection", "OK");
             }
         }
     }
 
     private async Task ImportCollectionAsync()
     {
+        var mainPage = Application.Current?.MainPage;
+        if (mainPage == null) return;
+
         // In a real app, you'd use a file picker
         // For now, let user paste JSON
-        var jsonData = await Application.Current.MainPage.DisplayPromptAsync(
+        var jsonData = await mainPage.DisplayPromptAsync(
             "Import Collection",
             "Paste collection JSON data:",
             "Import",
             "Cancel",
             "",
             -1,
-            Keyboard.Default);
+            Microsoft.Maui.Keyboard.Default);
 
         if (!string.IsNullOrWhiteSpace(jsonData))
         {
@@ -221,17 +239,17 @@ public class CollectionsViewModel : INotifyPropertyChanged
                     Collections.Add(collection);
                     OnPropertyChanged(nameof(HasNoCollections));
 
-                    await Application.Current.MainPage.DisplayAlert("Success", "Collection imported successfully!", "OK");
+                    await mainPage.DisplayAlert("Success", "Collection imported successfully!", "OK");
                 }
                 else
                 {
-                    await Application.Current.MainPage.DisplayAlert("Error", "Invalid collection data", "OK");
+                    await mainPage.DisplayAlert("Error", "Invalid collection data", "OK");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error importing collection");
-                await Application.Current.MainPage.DisplayAlert("Error", "Failed to import collection", "OK");
+                await mainPage.DisplayAlert("Error", "Failed to import collection", "OK");
             }
         }
     }

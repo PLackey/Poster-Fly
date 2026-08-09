@@ -26,7 +26,8 @@ public class HistoryViewModel : INotifyPropertyChanged
         DeleteFromHistoryCommand = new Command<ApiRequest>(async (request) => await DeleteFromHistoryAsync(request));
         ClearHistoryCommand = new Command(async () => await ClearHistoryAsync());
         
-        LoadHistoryAsync();
+        // Fire and forget - we want this to run in the background
+        _ = Task.Run(async () => await LoadHistoryAsync());
     }
 
     public ObservableCollection<ApiRequest> RecentRequests
@@ -73,7 +74,8 @@ public class HistoryViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading request history");
-            await Application.Current.MainPage.DisplayAlert("Error", "Failed to load request history", "OK");
+            if (Application.Current?.MainPage != null)
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to load request history", "OK");
         }
         finally
         {
@@ -81,9 +83,9 @@ public class HistoryViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task ReuseRequestAsync(ApiRequest request)
+    private async Task ReuseRequestAsync(ApiRequest? request)
     {
-        if (request == null) return;
+        if (request == null || Application.Current?.MainPage == null) return;
 
         // Navigate to the requests page with this request loaded
         // For now, just show a message
@@ -93,9 +95,9 @@ public class HistoryViewModel : INotifyPropertyChanged
             "OK");
     }
 
-    private async Task SaveFromHistoryAsync(ApiRequest request)
+    private async Task SaveFromHistoryAsync(ApiRequest? request)
     {
-        if (request == null) return;
+        if (request == null || Application.Current?.MainPage == null) return;
 
         var name = await Application.Current.MainPage.DisplayPromptAsync(
             "Save Request",
@@ -115,7 +117,7 @@ public class HistoryViewModel : INotifyPropertyChanged
                     Url = request.Url,
                     Type = request.Type,
                     Method = request.Method,
-                    Headers = new Dictionary<string, string>(request.Headers),
+                    Headers = new Dictionary<string, string>(request.Headers ?? new Dictionary<string, string>()),
                     Body = request.Body,
                     BodyType = request.BodyType,
                     UseSSL = request.UseSSL,
@@ -133,7 +135,7 @@ public class HistoryViewModel : INotifyPropertyChanged
                     ?? new Collection { Name = "Default", Description = "Default collection" };
 
                 newRequest.CollectionId = defaultCollection.Id.ToString();
-                defaultCollection.Requests.Add(newRequest);
+                defaultCollection.Requests?.Add(newRequest);
 
                 await _storageService.SaveCollectionAsync(defaultCollection);
                 await Application.Current.MainPage.DisplayAlert("Success", "Request saved to collection!", "OK");
@@ -146,9 +148,9 @@ public class HistoryViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task DeleteFromHistoryAsync(ApiRequest request)
+    private async Task DeleteFromHistoryAsync(ApiRequest? request)
     {
-        if (request == null) return;
+        if (request == null || Application.Current?.MainPage == null) return;
 
         var confirm = await Application.Current.MainPage.DisplayAlert(
             "Delete from History",
@@ -176,6 +178,8 @@ public class HistoryViewModel : INotifyPropertyChanged
 
     private async Task ClearHistoryAsync()
     {
+        if (Application.Current?.MainPage == null) return;
+
         var confirm = await Application.Current.MainPage.DisplayAlert(
             "Clear History",
             "Are you sure you want to clear all request history? This action cannot be undone.",

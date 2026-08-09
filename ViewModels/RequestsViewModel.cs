@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.Extensions.Logging;
 using PosterFly.Models;
 using PosterFly.Services;
+using Environment = PosterFly.Models.Environment;
 
 namespace PosterFly.ViewModels;
 
@@ -80,15 +81,15 @@ public class RequestsViewModel : INotifyPropertyChanged
     public bool IsGrpcRequest => CurrentRequest.Type == RequestType.GRPC;
     
     public bool ShowBodySection => IsHttpRequest && 
-        (CurrentRequest.Method == HttpMethod.POST || 
-         CurrentRequest.Method == HttpMethod.PUT || 
-         CurrentRequest.Method == HttpMethod.PATCH);
+        (CurrentRequest.Method == PosterFly.Models.HttpMethod.POST || 
+         CurrentRequest.Method == PosterFly.Models.HttpMethod.PUT || 
+         CurrentRequest.Method == PosterFly.Models.HttpMethod.PATCH);
 
     public ObservableCollection<KeyValuePair<string, string>> ResponseHeadersList =>
         new(LastResponse?.Headers ?? new Dictionary<string, string>());
 
     public List<string> RequestTypes => Enum.GetNames(typeof(RequestType)).ToList();
-    public List<string> HttpMethods => Enum.GetNames(typeof(HttpMethod)).ToList();
+    public List<string> HttpMethods => Enum.GetNames(typeof(PosterFly.Models.HttpMethod)).ToList();
     public List<string> BodyTypes => new() { "JSON", "XML", "Text", "Form", "Binary" };
 
     public string SelectedRequestType
@@ -113,7 +114,7 @@ public class RequestsViewModel : INotifyPropertyChanged
         get => CurrentRequest.Method.ToString();
         set
         {
-            if (Enum.TryParse<HttpMethod>(value, out var httpMethod))
+            if (Enum.TryParse<PosterFly.Models.HttpMethod>(value, out var httpMethod))
             {
                 CurrentRequest.Method = httpMethod;
                 OnPropertyChanged();
@@ -130,7 +131,9 @@ public class RequestsViewModel : INotifyPropertyChanged
     {
         if (string.IsNullOrWhiteSpace(CurrentRequest.Url))
         {
-            await Application.Current.MainPage.DisplayAlert("Error", "Please enter a URL", "OK");
+            var mainPage = Application.Current?.MainPage;
+            if (mainPage != null)
+                await mainPage.DisplayAlert("Error", "Please enter a URL", "OK");
             return;
         }
 
@@ -143,7 +146,7 @@ public class RequestsViewModel : INotifyPropertyChanged
             _activeEnvironment = await _variableService.GetActiveEnvironmentAsync();
             
             // Create a resolved copy of the request with variables substituted
-            var resolvedRequest = await ResolveVariablesInRequest(CurrentRequest);
+            var resolvedRequest = await ResolveVariablesInRequestAsync(CurrentRequest);
             
             ApiResponse response = resolvedRequest.Type switch
             {
@@ -161,7 +164,9 @@ public class RequestsViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error sending request");
-            await Application.Current.MainPage.DisplayAlert("Error", $"Request failed: {ex.Message}", "OK");
+            var mainPage = Application.Current?.MainPage;
+            if (mainPage != null)
+                await mainPage.DisplayAlert("Error", $"Request failed: {ex.Message}", "OK");
         }
         finally
         {
@@ -169,7 +174,7 @@ public class RequestsViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task<ApiRequest> ResolveVariablesInRequest(ApiRequest originalRequest)
+    private Task<ApiRequest> ResolveVariablesInRequestAsync(ApiRequest originalRequest)
     {
         var resolvedRequest = new ApiRequest
         {
@@ -211,7 +216,7 @@ public class RequestsViewModel : INotifyPropertyChanged
         resolvedRequest.GrpcMethod = _variableService.ResolveVariables(originalRequest.GrpcMethod ?? string.Empty, _activeEnvironment, originalRequest.CollectionId);
         resolvedRequest.ProtoFile = _variableService.ResolveVariables(originalRequest.ProtoFile ?? string.Empty, _activeEnvironment, originalRequest.CollectionId);
 
-        return resolvedRequest;
+        return Task.FromResult(resolvedRequest);
     }
 
     public async Task<List<string>> GetVariableAutoCompleteAsync(string prefix)
@@ -232,7 +237,10 @@ public class RequestsViewModel : INotifyPropertyChanged
         if (LastResponse == null)
             return;
 
-        var name = await Application.Current.MainPage.DisplayPromptAsync(
+        var mainPage = Application.Current?.MainPage;
+        if (mainPage == null) return;
+
+        var name = await mainPage.DisplayPromptAsync(
             "Save Request", 
             "Enter a name for this request:", 
             "Save", 
@@ -252,7 +260,7 @@ public class RequestsViewModel : INotifyPropertyChanged
             defaultCollection.Requests.Add(CurrentRequest);
             
             await _storageService.SaveCollectionAsync(defaultCollection);
-            await Application.Current.MainPage.DisplayAlert("Success", "Request saved successfully!", "OK");
+            await mainPage.DisplayAlert("Success", "Request saved successfully!", "OK");
         }
     }
 

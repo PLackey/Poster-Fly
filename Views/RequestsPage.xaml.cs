@@ -9,4 +9,13 @@ public partial class RequestsPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    private void OnHeadersToggleClicked(object sender, EventArgs e)
+    {
+        if (sender is Button button && HeadersContainer != null)
+        {
+            HeadersContainer.IsVisible = !HeadersContainer.IsVisible;
+            button.Text = HeadersContainer.IsVisible ? "▲ Response Headers" : "▼ Response Headers";
+        }
+    }
 }

@@ -2,7 +2,16 @@
 <ContentPage x:Class="PosterFly.Views.RequestsPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:PosterFly.Converters"
              Title="API Requests">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:HttpMethodToColorConverter x:Key="HttpMethodToColorConverter" />
+            <converters:RequestTypeToColorConverter x:Key="RequestTypeToColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
     
     <ScrollView>
         <StackLayout Padding="20" Spacing="15">
@@ -111,13 +120,13 @@
                 <StackLayout Spacing="10">
                     <Label Text="GraphQL Query" FontAttributes="Bold"/>
                     <Editor Text="{Binding CurrentRequest.GraphQLQuery}"
-                            Placeholder="query { users { id name email } }"
+                            Placeholder="query GetUsers($limit: Int) { users(limit: $limit) { id name email } }"
                             HeightRequest="150"
                             BackgroundColor="LightGray"/>
                     
                     <Label Text="Variables (JSON)" FontAttributes="Bold"/>
                     <Editor Text="{Binding CurrentRequest.GraphQLVariables}"
-                            Placeholder='{ "limit": 10 }'
+                            Placeholder="Variables in JSON format, e.g.: {&quot;limit&quot;: 10, &quot;offset&quot;: 0}"
                             HeightRequest="100"
                             BackgroundColor="LightGray"/>
                 </StackLayout>
@@ -137,7 +146,7 @@
                     
                     <Label Text="Request Message (JSON)" FontAttributes="Bold"/>
                     <Editor Text="{Binding CurrentRequest.Body}"
-                            Placeholder='{ "userId": 123 }'
+                            Placeholder="JSON message, e.g.: {&quot;userId&quot;: 123, &quot;includeProfile&quot;: true}"
                             HeightRequest="100"
                             BackgroundColor="LightGray"/>
                 </StackLayout>
@@ -158,21 +167,27 @@
                     </StackLayout>
                     
                     <!-- Response Headers -->
-                    <Expander>
-                        <Expander.Header>
-                            <Label Text="Response Headers" FontAttributes="Bold"/>
-                        </Expander.Header>
-                        <CollectionView ItemsSource="{Binding ResponseHeadersList}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid ColumnDefinitions="Auto,*" Padding="5">
-                                        <Label Grid.Column="0" Text="{Binding Key}" FontAttributes="Bold"/>
-                                        <Label Grid.Column="1" Text="{Binding Value}" Margin="10,0,0,0"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </Expander>
+                    <StackLayout Spacing="5">
+                        <Button x:Name="HeadersToggleButton" 
+                                Text="▼ Response Headers" 
+                                BackgroundColor="Transparent" 
+                                TextColor="Black" 
+                                FontAttributes="Bold"
+                                HorizontalOptions="StartAndExpand"
+                                Clicked="OnHeadersToggleClicked"/>
+                        <StackLayout x:Name="HeadersContainer" IsVisible="False">
+                            <CollectionView ItemsSource="{Binding ResponseHeadersList}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnDefinitions="Auto,*" Padding="5" BackgroundColor="#F5F5F5" Margin="0,1">
+                                            <Label Grid.Column="0" Text="{Binding Key}" FontAttributes="Bold" FontSize="Small"/>
+                                            <Label Grid.Column="1" Text="{Binding Value}" Margin="10,0,0,0" FontSize="Small"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </StackLayout>
+                    </StackLayout>
                     
                     <!-- Response Body -->
                     <Label Text="Response Body" FontAttributes="Bold"/>

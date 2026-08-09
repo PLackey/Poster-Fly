@@ -73,7 +73,7 @@ public partial class VariableAutoCompleteEntry : ContentView
     private void OnEntryUnfocused(object sender, FocusEventArgs e)
     {
         // Delay hiding to allow for suggestion selection
-        Device.StartTimer(TimeSpan.FromMilliseconds(200), () =>
+        Dispatcher.StartTimer(TimeSpan.FromMilliseconds(200), () =>
         {
             HideSuggestions();
             HintLabel.IsVisible = false;
@@ -209,14 +209,14 @@ public partial class VariableAutoCompleteEntry : ContentView
     {
         if (!_isShowingSuggestions && Suggestions.Any())
         {
-            AutoCompleteFrame.IsVisible = true;
+            AutoCompleteBorder.IsVisible = true;
             _isShowingSuggestions = true;
         }
     }
 
     private void HideSuggestions()
     {
-        AutoCompleteFrame.IsVisible = false;
+        AutoCompleteBorder.IsVisible = false;
         _isShowingSuggestions = false;
         Suggestions.Clear();
     }

@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using PosterFly.Models;
+using Environment = PosterFly.Models.Environment;
 
 namespace PosterFly.Services;
 
@@ -21,7 +23,7 @@ public class VariableService : IVariableService
     public VariableService(ILogger<VariableService> logger)
     {
         _logger = logger;
-        var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PosterFly");
+        var appDataPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "PosterFly");
         Directory.CreateDirectory(appDataPath);
         
         _variablesPath = Path.Combine(appDataPath, "variables.json");
