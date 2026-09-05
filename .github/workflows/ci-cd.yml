@@ -1,0 +1,325 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  MAUI_VERSION: '8.0.x'
+
+jobs:
+  # Build and Test Job
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore MAUI workloads
+      run: |
+        # For .NET 8+ use workload restore which automatically installs required workloads
+        echo "Restoring workloads based on project requirements..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, trying manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install android || \
+        dotnet workload install android || \
+        echo "Manual workload installation also failed, but continuing..."
+        
+        # List installed workloads for debugging
+        dotnet workload list || echo "Could not list workloads"
+        
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Build solution
+      run: dotnet build PosterFly.csproj --configuration Release --no-restore
+      
+    - name: Run tests (if any exist)
+      run: |
+        if [ -d "Tests" ] || find . -name "*.Tests.csproj" | grep -q .; then
+          dotnet test --configuration Release --no-build --verbosity normal
+        else
+          echo "No test projects found, skipping tests"
+        fi
+
+  # Android Build Job
+  build-android:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'microsoft'
+        java-version: '17'
+        
+    - name: Restore MAUI Android workloads
+      run: |
+        echo "Restoring Android workloads based on project requirements..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, trying manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install android || \
+        dotnet workload install android || \
+        sudo dotnet workload install maui-android || \
+        dotnet workload install maui-android || \
+        echo "Manual Android workload installation also failed, but continuing..."
+        
+        # List installed workloads
+        dotnet workload list || echo "Could not list workloads"
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Build Android APK
+      run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
+      
+    - name: Build Android AAB (Release)
+      if: startsWith(github.ref, 'refs/tags/')
+      run: dotnet publish PosterFly.csproj -c Release -f net10.0-android --no-restore -p:AndroidPackageFormat=aab
+      
+    - name: Upload Android APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: |
+          **/*-Signed.apk
+          **/bin/Release/**/*.apk
+        retention-days: 30
+        
+    - name: Upload Android AAB
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-aab
+        path: |
+          **/*-Signed.aab
+          **/bin/Release/**/*.aab
+        retention-days: 90
+
+  # Windows Build Job
+  build-windows:
+    needs: build-and-test
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore MAUI Windows workloads
+      run: |
+        echo "Restoring Windows workloads based on project requirements..."
+        dotnet workload restore PosterFly.csproj
+        
+        # List installed workloads
+        dotnet workload list
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Build Windows MSIX (Unpackaged)
+      run: dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore
+      
+    - name: Publish Windows MSIX (Release)
+      if: startsWith(github.ref, 'refs/tags/')
+      run: dotnet publish PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
+      
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-build
+        path: |
+          **/bin/Release/**/*.exe
+          **/bin/Release/**/*.msix
+          **/publish/**
+        retention-days: 30
+
+  # macOS Build Job
+  build-macos:
+    needs: build-and-test
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore MAUI macOS workloads
+      run: |
+        echo "Restoring macOS workloads based on project requirements..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, trying manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install maccatalyst || \
+        dotnet workload install maccatalyst || \
+        sudo dotnet workload install maui-maccatalyst || \
+        dotnet workload install maui-maccatalyst || \
+        echo "Manual macOS workload installation also failed, but continuing..."
+        
+        # List installed workloads
+        dotnet workload list || echo "Could not list workloads"
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Build macOS
+      run: dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore
+      
+    - name: Upload macOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-build
+        path: |
+          **/bin/Release/**/*.app
+          **/bin/Release/**/*.pkg
+        retention-days: 30
+
+  # iOS Build Job (requires additional setup for certificates)
+  build-ios:
+    needs: build-and-test
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore MAUI iOS workloads
+      run: |
+        echo "Restoring iOS workloads based on project requirements..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, trying manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install ios || \
+        dotnet workload install ios || \
+        sudo dotnet workload install maui-ios || \
+        dotnet workload install maui-ios || \
+        echo "Manual iOS workload installation also failed, but continuing..."
+        
+        # List installed workloads
+        dotnet workload list || echo "Could not list workloads"
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Build iOS (without signing)
+      run: dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=ios-arm64
+      continue-on-error: true  # iOS builds may fail without proper certificates
+      
+    - name: Upload iOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-build
+        path: |
+          **/bin/Release/**/*.ipa
+          **/bin/Release/**/*.app
+        retention-days: 30
+      if: success()
+
+  # Create GitHub Release (only on tags)
+  create-release:
+    needs: [build-android, build-windows, build-macos, build-ios]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        draft: true
+        generate_release_notes: true
+        files: |
+          android-apk/**/*
+          android-aab/**/*
+          windows-build/**/*
+          macos-build/**/*
+          ios-build/**/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Code Quality and Security Scanning
+  code-quality:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore basic workloads
+      run: |
+        echo "Restoring workloads for code analysis..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, trying manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install android || \
+        dotnet workload install android || \
+        echo "Manual workload installation also failed, but code analysis can continue..."
+        
+        # List installed workloads
+        dotnet workload list || echo "Could not list workloads"
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Run code analysis
+      run: dotnet build PosterFly.csproj --configuration Release --verbosity normal
+      
+    - name: Security scan with CodeQL (if enabled)
+      if: false  # Enable this by changing to 'true' and setting up CodeQL
+      uses: github/codeql-action/analyze@v3

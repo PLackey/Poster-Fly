@@ -1,0 +1,267 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      version_number: ${{ steps.version.outputs.version_number }}
+    
+    steps:
+    - name: Extract version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION="${GITHUB_REF#refs/tags/}"
+        fi
+        VERSION_NUMBER="${VERSION#v}"
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "version_number=${VERSION_NUMBER}" >> $GITHUB_OUTPUT
+        echo "Building version: ${VERSION}"
+
+  build-android-release:
+    needs: prepare-release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'microsoft'
+        java-version: '17'
+        
+    - name: Restore MAUI Android workloads
+      run: |
+        echo "Restoring Android workloads for release build..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but continuing with manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install android || \
+        dotnet workload install android || \
+        sudo dotnet workload install maui-android || \
+        dotnet workload install maui-android || \
+        echo "Manual Android workload installation also failed, but continuing..."
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Update version in project
+      run: |
+        sed -i 's/<ApplicationDisplayVersion>.*<\/ApplicationDisplayVersion>/<ApplicationDisplayVersion>${{ needs.prepare-release.outputs.version_number }}<\/ApplicationDisplayVersion>/' PosterFly.csproj
+        sed -i 's/<ApplicationVersion>.*<\/ApplicationVersion>/<ApplicationVersion>${{ github.run_number }}<\/ApplicationVersion>/' PosterFly.csproj
+      
+    - name: Build Android APK
+      run: dotnet build PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-android --no-restore
+      
+    - name: Build Android AAB for Play Store
+      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-android --no-restore -p:AndroidPackageFormat=aab -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=${{ secrets.ANDROID_KEYSTORE }} -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASS }} -p:AndroidSigningStorePass=${{ secrets.ANDROID_STORE_PASS }}
+      if: env.ANDROID_KEYSTORE != ''
+      env:
+        ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+      
+    - name: Upload Android Release Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-release-${{ needs.prepare-release.outputs.version }}
+        path: |
+          **/bin/Release/**/*.apk
+          **/bin/Release/**/*.aab
+        retention-days: 90
+
+  build-windows-release:
+    needs: prepare-release
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore MAUI Windows workloads
+      run: |
+        echo "Restoring Windows workloads for release build..."
+        dotnet workload restore PosterFly.csproj
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Update version in project
+      shell: pwsh
+      run: |
+        (Get-Content PosterFly.csproj) -replace '<ApplicationDisplayVersion>.*</ApplicationDisplayVersion>', '<ApplicationDisplayVersion>${{ needs.prepare-release.outputs.version_number }}</ApplicationDisplayVersion>' | Set-Content PosterFly.csproj
+        (Get-Content PosterFly.csproj) -replace '<ApplicationVersion>.*</ApplicationVersion>', '<ApplicationVersion>${{ github.run_number }}</ApplicationVersion>' | Set-Content PosterFly.csproj
+      
+    - name: Build Windows MSIX
+      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
+      
+    - name: Upload Windows Release Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-release-${{ needs.prepare-release.outputs.version }}
+        path: |
+          **/bin/Release/**/*.exe
+          **/bin/Release/**/*.msix
+          **/publish/**
+        retention-days: 90
+
+  build-macos-release:
+    needs: prepare-release
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore MAUI macOS workloads
+      run: |
+        echo "Restoring macOS workloads for release build..."
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but continuing with manual installation..."
+        
+        # Fallback to manual installation if restore fails
+        sudo dotnet workload install maccatalyst || \
+        dotnet workload install maccatalyst || \
+        sudo dotnet workload install maui-maccatalyst || \
+        dotnet workload install maui-maccatalyst || \
+        echo "Manual macOS workload installation also failed, but continuing..."
+      
+    - name: Restore dependencies
+      run: dotnet restore PosterFly.csproj
+      
+    - name: Update version in project
+      run: |
+        sed -i '' 's/<ApplicationDisplayVersion>.*<\/ApplicationDisplayVersion>/<ApplicationDisplayVersion>${{ needs.prepare-release.outputs.version_number }}<\/ApplicationDisplayVersion>/' PosterFly.csproj
+        sed -i '' 's/<ApplicationVersion>.*<\/ApplicationVersion>/<ApplicationVersion>${{ github.run_number }}<\/ApplicationVersion>/' PosterFly.csproj
+      
+    - name: Build macOS
+      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-maccatalyst --no-restore -p:RuntimeIdentifier=maccatalyst-x64
+      
+    - name: Upload macOS Release Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-release-${{ needs.prepare-release.outputs.version }}
+        path: |
+          **/bin/Release/**/*.app
+          **/bin/Release/**/*.pkg
+          **/publish/**
+        retention-days: 90
+
+  create-github-release:
+    needs: [prepare-release, build-android-release, build-windows-release, build-macos-release]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Generate changelog from commits since last tag
+        if git describe --tags --abbrev=0 HEAD^ >/dev/null 2>&1; then
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^)
+          CHANGELOG=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+        else
+          CHANGELOG="- Initial release"
+        fi
+        
+        cat > RELEASE_NOTES.md << EOF
+        # Poster Fly ${{ needs.prepare-release.outputs.version }}
+        
+        ## 🚀 What's New
+        ${CHANGELOG}
+        
+        ## 📱 Downloads
+        
+        ### Android
+        - **APK**: Direct installation file for Android devices
+        - **AAB**: Google Play Store bundle (for store publishing)
+        
+        ### Windows
+        - **EXE**: Standalone executable for Windows 10/11
+        - **MSIX**: Microsoft Store package format
+        
+        ### macOS
+        - **APP**: macOS application bundle
+        - **PKG**: macOS installer package
+        
+        ## 🔧 Installation Instructions
+        
+        ### Android
+        1. Download the APK file
+        2. Enable "Install from Unknown Sources" in Android settings
+        3. Install the APK file
+        
+        ### Windows
+        1. Download the EXE or MSIX file
+        2. Run the installer and follow the setup wizard
+        3. The app will be available in your Start Menu
+        
+        ### macOS
+        1. Download the APP or PKG file
+        2. For APP: Drag to Applications folder
+        3. For PKG: Run the installer
+        
+        ## 🐛 Bug Reports
+        If you encounter any issues, please report them on our [GitHub Issues](https://github.com/${{ github.repository }}/issues) page.
+        
+        ## 🙏 Contributors
+        Thank you to all contributors who made this release possible!
+        EOF
+        
+        echo "changelog_file=RELEASE_NOTES.md" >> $GITHUB_OUTPUT
+      
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.prepare-release.outputs.version }}
+        name: Poster Fly ${{ needs.prepare-release.outputs.version }}
+        body_path: RELEASE_NOTES.md
+        draft: false
+        prerelease: ${{ contains(needs.prepare-release.outputs.version, '-') }}
+        files: |
+          android-release-${{ needs.prepare-release.outputs.version }}/**/*
+          windows-release-${{ needs.prepare-release.outputs.version }}/**/*
+          macos-release-${{ needs.prepare-release.outputs.version }}/**/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
