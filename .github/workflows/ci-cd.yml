@@ -45,8 +45,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore PosterFly.csproj
       
-    - name: Build solution
-      run: dotnet build PosterFly.csproj --configuration Release --no-restore
+    - name: Build solution (Android only on Ubuntu)
+      run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net10.0-android
       
     - name: Run tests (if any exist)
       run: |
@@ -181,16 +181,10 @@ jobs:
     - name: Restore MAUI macOS workloads
       run: |
         echo "Restoring macOS workloads based on project requirements..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, trying manual installation..."
-        
-        # Fallback to manual installation if restore fails
-        sudo dotnet workload install maccatalyst || \
-        dotnet workload install maccatalyst || \
-        sudo dotnet workload install maui-maccatalyst || \
-        dotnet workload install maui-maccatalyst || \
-        echo "Manual macOS workload installation also failed, but continuing..."
+        # Install iOS and macCatalyst workloads (both available on macOS runner)
+        sudo dotnet workload install ios maccatalyst || \
+        dotnet workload install ios maccatalyst || \
+        echo "macOS workload installation failed, but continuing..."
         
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
@@ -198,7 +192,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore PosterFly.csproj
       
-    - name: Build macOS
+    - name: Build macOS (macCatalyst only)
       run: dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore
       
     - name: Upload macOS artifacts
@@ -227,16 +221,10 @@ jobs:
     - name: Restore MAUI iOS workloads
       run: |
         echo "Restoring iOS workloads based on project requirements..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, trying manual installation..."
-        
-        # Fallback to manual installation if restore fails
-        sudo dotnet workload install ios || \
-        dotnet workload install ios || \
-        sudo dotnet workload install maui-ios || \
-        dotnet workload install maui-ios || \
-        echo "Manual iOS workload installation also failed, but continuing..."
+        # Install iOS and macCatalyst workloads (both available on macOS runner)
+        sudo dotnet workload install ios maccatalyst || \
+        dotnet workload install ios maccatalyst || \
+        echo "iOS workload installation failed, but continuing..."
         
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
@@ -299,17 +287,13 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-    - name: Restore basic workloads
+    - name: Restore MAUI workloads
       run: |
         echo "Restoring workloads for code analysis..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, trying manual installation..."
-        
-        # Fallback to manual installation if restore fails
+        # Only install Android workload for Ubuntu code analysis
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        echo "Manual workload installation also failed, but code analysis can continue..."
+        echo "Android workload installation failed, but code analysis can continue..."
         
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
@@ -318,7 +302,9 @@ jobs:
       run: dotnet restore PosterFly.csproj
       
     - name: Run code analysis
-      run: dotnet build PosterFly.csproj --configuration Release --verbosity normal
+      run: |
+        # Run built-in analyzers on Android target only (compatible with Ubuntu)
+        dotnet build PosterFly.csproj --configuration Release --verbosity normal --no-restore -f net10.0-android
       
     - name: Security scan with CodeQL (if enabled)
       if: false  # Enable this by changing to 'true' and setting up CodeQL

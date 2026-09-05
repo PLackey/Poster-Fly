@@ -58,13 +58,14 @@ git push origin v1.0.0
 
 ## 🔧 Setup Requirements
 
-### MAUI Workload Installation
-The workflows use `dotnet workload restore` for .NET 8+ which automatically installs the required workloads based on your project file:
+### MAUI Workload Installation (.NET 8+)
+The workflows use platform-specific workload installation and target framework selection:
 
-- **Primary Method**: `dotnet workload restore PosterFly.csproj` - Automatically installs all required workloads
-- **Ubuntu/Linux**: Uses `sudo` for elevated permissions when needed
-- **Windows**: Uses standard workload restore without elevation
-- **Fallback**: Manual installation of individual workloads if restore fails
+- **Ubuntu runners**: Only install `android` workload and build `net10.0-android` target
+- **Windows runners**: Only install `windows` workload and build `net10.0-windows10.0.19041.0` target  
+- **macOS runners**: Install `ios` and `maccatalyst` workloads and build both `net10.0-ios` and `net10.0-maccatalyst` targets
+
+This approach avoids the NETSDK1178 error that occurs when trying to build iOS targets on Ubuntu or Windows runners.
 
 The workflows automatically handle workload installation failures and continue with graceful fallbacks.
 
@@ -137,15 +138,20 @@ git push origin v1.0.0
 
 ### Common Issues
 
-#### 1. MAUI Workload Issues (.NET 8+)
+#### 1. Platform-Specific Workload Issues (.NET 8+)
 ```bash
-# For .NET 8+ (.NET 10), use workload restore instead of individual installs
-dotnet workload restore PosterFly.csproj
+# The error NETSDK1178 occurs when trying to build iOS targets on Ubuntu runners
+# The workflows now handle this by building only compatible targets on each runner:
 
-# The workflows now use this approach automatically:
-# 1. Try dotnet workload restore (recommended for .NET 8+)
-# 2. Try sudo dotnet workload restore (for permission issues)
-# 3. Fall back to manual workload installation if restore fails
+# Ubuntu runners (build-android, test-android-build):
+dotnet build PosterFly.csproj -f net10.0-android
+
+# Windows runners (build-windows, test-windows-build):  
+dotnet build PosterFly.csproj -f net10.0-windows10.0.19041.0
+
+# macOS runners (build-macos, build-ios):
+dotnet build PosterFly.csproj -f net10.0-maccatalyst
+dotnet build PosterFly.csproj -f net10.0-ios
 ```
 
 #### 2. Build Fails on Specific Platform
@@ -211,16 +217,17 @@ dotnet workload restore PosterFly.csproj
 
 ## ⚡ Recent Updates
 
-### Fixed MAUI Workload Issues (.NET 8+)
-- **Workload Restore**: Uses `dotnet workload restore` which automatically installs required workloads based on project file
-- **Graceful fallbacks**: Falls back to manual workload installation if restore fails
-- **Elevated permissions**: Uses `sudo` on Linux/macOS when required
-- **Error handling**: Continues build process even if workload installation fails
+### Fixed Platform-Specific Build Issues (.NET 8+)
+- **Platform-appropriate targets**: Each runner type builds only compatible target frameworks
+- **Ubuntu runners**: Build Android targets only (`net10.0-android`)
+- **Windows runners**: Build Windows targets only (`net10.0-windows10.0.19041.0`) 
+- **macOS runners**: Build iOS and macCatalyst targets (`net10.0-ios`, `net10.0-maccatalyst`)
+- **Error handling**: Eliminates NETSDK1178 errors from cross-platform workload conflicts
 
 ### Improved Error Handling
-- **Automatic workload detection**: Project-based workload requirements instead of guessing
+- **Platform compatibility**: No more iOS workload errors on Ubuntu runners
 - **Build logging**: Enhanced logging for better troubleshooting
-- **Platform compatibility**: Better handling of .NET 8+ workload system
+- **Target framework selection**: Automatic target framework selection based on runner type
 
 ## 📚 Additional Resources
 
@@ -232,4 +239,4 @@ dotnet workload restore PosterFly.csproj
 
 ---
 
-💡 **Tip**: The workflows now use `dotnet workload restore` for .NET 8+ which automatically installs the correct workloads based on your project file. If you encounter workload issues locally, try `dotnet workload restore PosterFly.csproj` first.
+💡 **Tip**: The workflows now build platform-specific targets on each runner type to avoid workload conflicts. Ubuntu builds Android, Windows builds Windows, and macOS builds both iOS and macCatalyst targets. If you encounter NETSDK1178 errors locally, specify the target framework: `dotnet build -f net10.0-android`

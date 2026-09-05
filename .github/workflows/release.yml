@@ -58,16 +58,10 @@ jobs:
     - name: Restore MAUI Android workloads
       run: |
         echo "Restoring Android workloads for release build..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, but continuing with manual installation..."
-        
-        # Fallback to manual installation if restore fails
+        # Only install Android workload for Ubuntu
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        sudo dotnet workload install maui-android || \
-        dotnet workload install maui-android || \
-        echo "Manual Android workload installation also failed, but continuing..."
+        echo "Android workload installation failed, but continuing..."
       
     - name: Restore dependencies
       run: dotnet restore PosterFly.csproj
@@ -111,7 +105,8 @@ jobs:
     - name: Restore MAUI Windows workloads
       run: |
         echo "Restoring Windows workloads for release build..."
-        dotnet workload restore PosterFly.csproj
+        # Only install Windows workload
+        dotnet workload install windows
       
     - name: Restore dependencies
       run: dotnet restore PosterFly.csproj
@@ -151,16 +146,10 @@ jobs:
     - name: Restore MAUI macOS workloads
       run: |
         echo "Restoring macOS workloads for release build..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, but continuing with manual installation..."
-        
-        # Fallback to manual installation if restore fails
-        sudo dotnet workload install maccatalyst || \
-        dotnet workload install maccatalyst || \
-        sudo dotnet workload install maui-maccatalyst || \
-        dotnet workload install maui-maccatalyst || \
-        echo "Manual macOS workload installation also failed, but continuing..."
+        # Install iOS and macCatalyst workloads (both available on macOS runner)
+        sudo dotnet workload install ios maccatalyst || \
+        dotnet workload install ios maccatalyst || \
+        echo "macOS workload installation failed, but continuing..."
       
     - name: Restore dependencies
       run: dotnet restore PosterFly.csproj
@@ -170,16 +159,21 @@ jobs:
         sed -i '' 's/<ApplicationDisplayVersion>.*<\/ApplicationDisplayVersion>/<ApplicationDisplayVersion>${{ needs.prepare-release.outputs.version_number }}<\/ApplicationDisplayVersion>/' PosterFly.csproj
         sed -i '' 's/<ApplicationVersion>.*<\/ApplicationVersion>/<ApplicationVersion>${{ github.run_number }}<\/ApplicationVersion>/' PosterFly.csproj
       
-    - name: Build macOS
+    - name: Build macCatalyst
       run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-maccatalyst --no-restore -p:RuntimeIdentifier=maccatalyst-x64
       
-    - name: Upload macOS Release Artifacts
+    - name: Build iOS
+      run: dotnet build PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=ios-arm64
+      continue-on-error: true  # iOS builds may fail without proper certificates
+      
+    - name: Upload macOS/iOS Release Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: macos-release-${{ needs.prepare-release.outputs.version }}
+        name: macos-ios-release-${{ needs.prepare-release.outputs.version }}
         path: |
           **/bin/Release/**/*.app
           **/bin/Release/**/*.pkg
+          **/bin/Release/**/*.ipa
           **/publish/**
         retention-days: 90
 
@@ -262,6 +256,6 @@ jobs:
         files: |
           android-release-${{ needs.prepare-release.outputs.version }}/**/*
           windows-release-${{ needs.prepare-release.outputs.version }}/**/*
-          macos-release-${{ needs.prepare-release.outputs.version }}/**/*
+          macos-ios-release-${{ needs.prepare-release.outputs.version }}/**/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
