@@ -1,0 +1,30 @@
+POSTER FLY - LEGAL DISCLAIMER
+
+⚠️ WARRANTY DISCLAIMER ⚠️
+This software is provided "AS IS" without warranty of any kind.
+
+🇺🇸 FOR US USERS:
+• No express, implied, or statutory warranties
+• Maximum liability: $100 USD  
+• No consequential damages
+• Claims must be filed within 1 year
+
+🇬🇧 FOR UK USERS:
+• Consumer rights under Consumer Rights Act 2015 preserved
+• Business users: Maximum liability £1,000 GBP
+• No exclusion for death/injury or fraud
+• Governed by English law
+
+🔒 YOUR RESPONSIBILITIES:
+• Secure your API credentials and sensitive data
+• Comply with data protection laws (GDPR, CCPA, etc.)
+• You are responsible for third-party API compliance
+• Local data storage - secure your device appropriately
+
+📋 COMPLETE TERMS:
+Full warranty disclaimers and liability limitations available at:
+https://github.com/PLackey/Poster-Fly/blob/main/DISCLAIMER.md
+
+By using this software, you acknowledge reading and agreeing to these terms.
+
+Last updated: December 2024

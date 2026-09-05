@@ -1,0 +1,15 @@
+/*
+ * Poster Fly - API Testing Tool
+ * 
+ * Copyright (c) 2026 Poster Fly Contributors
+ * 
+ * This software is licensed under the MIT License.
+ * See LICENSE file for full license terms.
+ * 
+ * DISCLAIMER: This software is provided "AS IS" without warranty of any kind.
+ * See DISCLAIMER.md for complete warranty disclaimers and liability limitations.
+ * 
+ * For US users: Maximum liability limited to $100 USD.
+ * For UK users: Consumer rights under Consumer Rights Act 2015 not affected.
+ * Business users subject to liability limitations as described in DISCLAIMER.md.
+ */

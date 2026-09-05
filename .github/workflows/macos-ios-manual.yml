@@ -1,0 +1,95 @@
+name: Manual macOS/iOS Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      xcode_version:
+        description: 'Xcode version to use (e.g., 26.5, latest-stable)'
+        required: false
+        default: 'latest-stable'
+        type: string
+
+env:
+  DOTNET_VERSION: '9.0.x'
+
+jobs:
+  build-macos-manual:
+    runs-on: macos-latest
+    name: Manual macOS/iOS Build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Xcode (manual version)
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: ${{ inputs.xcode_version }}
+      continue-on-error: true
+        
+    - name: Check Xcode and .NET versions
+      run: |
+        echo "=== Environment Information ==="
+        xcodebuild -version || echo "Could not get Xcode version"
+        dotnet --version || echo "Could not get .NET version"
+        echo "=== MAUI Workloads ==="
+        dotnet workload list || echo "Could not list workloads"
+        
+    - name: Update MAUI workloads
+      run: |
+        echo "Updating MAUI workloads..."
+        dotnet workload update || echo "Workload update failed"
+        dotnet workload install maui || echo "MAUI workload install failed"
+        dotnet workload list || echo "Could not list updated workloads"
+        
+    - name: Restore dependencies
+      run: |
+        echo "Restoring dependencies for macOS and iOS..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks="net9.0-maccatalyst;net9.0-ios" || \
+        echo "Restore failed for some platforms"
+      
+    - name: Build macOS (MacCatalyst)
+      run: |
+        echo "Building macOS (MacCatalyst)..."
+        dotnet build PosterFly.csproj -c Release -f net9.0-maccatalyst --no-restore -v normal || \
+        echo "macCatalyst build failed"
+      continue-on-error: true
+      
+    - name: Build iOS
+      run: |
+        echo "Building iOS..."
+        dotnet build PosterFly.csproj -c Release -f net9.0-ios --no-restore -v normal || \
+        echo "iOS build failed"
+      continue-on-error: true
+      
+    - name: Upload macOS/iOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-ios-manual-build
+        path: |
+          **/bin/Release/**/*.app
+          **/bin/Release/**/*.pkg
+          **/bin/Release/**/*.ipa
+        retention-days: 30
+      if: always()
+      
+    - name: Build Summary
+      run: |
+        echo "=== Build Summary ==="
+        echo "This manual workflow attempted to build macOS and iOS targets."
+        echo "Check the logs above to see which platforms succeeded or failed."
+        echo ""
+        echo "Common issues:"
+        echo "1. Xcode version incompatibility with .NET MAUI SDK"
+        echo "2. Missing iOS development certificates (expected for CI)"
+        echo "3. Missing Apple Developer account setup"
+        echo ""
+        echo "For local development:"
+        echo "1. Use Visual Studio for Mac or VS Code with C# Dev Kit"
+        echo "2. Install the correct Xcode version for your .NET MAUI version"
+        echo "3. Set up Apple Developer certificates for iOS deployment"

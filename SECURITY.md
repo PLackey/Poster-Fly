@@ -1,177 +1,132 @@
-# Security Policy
+# Security and Privacy Notice
 
-## Supported Versions
+## 🔒 Security Considerations
 
-We provide security updates for the following versions of Poster Fly:
+### Your Responsibility for API Security
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+**IMPORTANT**: As an API testing tool, Poster Fly handles sensitive information. You are solely responsible for:
 
-## Reporting a Vulnerability
+#### 🔑 **API Credentials & Authentication**
+- **Secure Storage**: Store API keys, tokens, and credentials securely
+- **Access Control**: Limit access to devices/accounts with API credentials
+- **Rotation**: Regularly rotate API keys and authentication tokens
+- **Scope Limitation**: Use minimum required permissions for API access
 
-The Poster Fly team takes security issues seriously. We appreciate your efforts to responsibly disclose security vulnerabilities.
+#### 📊 **Data Protection**
+- **Sensitive Data**: Be cautious when testing APIs with personal or sensitive data
+- **Data Retention**: Clear request/response history containing sensitive information
+- **Local Storage**: Data is stored locally on your device - secure your device accordingly
+- **Third-Party APIs**: Ensure you have permission to test third-party APIs
 
-### How to Report
+### Security Best Practices
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+#### ✅ **Recommended Practices**
+- Use test/sandbox environments when possible
+- Implement proper access controls on testing devices
+- Regularly review and clean stored request history
+- Use environment-specific variables for different deployment stages
+- Keep the application updated to the latest version
 
-Instead, please report security vulnerabilities by:
+#### ❌ **Avoid These Practices**  
+- Don't store production API keys in the application
+- Don't test with real customer data unless necessary
+- Don't share devices with stored API credentials
+- Don't ignore certificate validation errors in production APIs
 
-1. **Email**: Send details to [security@posterfly.com] (replace with actual email)
-2. **Private GitHub Report**: Use GitHub's private vulnerability reporting feature
-3. **Encrypted Communication**: For sensitive reports, request our PGP key
+## 🛡️ Privacy Information
 
-### What to Include
+### Data Collection and Storage
 
-Please include the following information in your report:
+**LOCAL STORAGE ONLY**: Poster Fly stores all data locally on your device:
+- ✅ API requests and responses are stored locally
+- ✅ Collections and variables are saved to local storage
+- ✅ No data is transmitted to external servers by Poster Fly
+- ✅ No analytics or tracking data is collected
 
-- **Vulnerability Description**: Clear description of the security issue
-- **Impact Assessment**: Potential impact and affected components
-- **Reproduction Steps**: Detailed steps to reproduce the vulnerability
-- **Proof of Concept**: Code or screenshots demonstrating the issue
-- **Suggested Fix**: If you have ideas for remediation
-- **Environment Details**: 
-  - Platform (Android/iOS/Windows/macOS)
-  - App version
-  - Device/OS version
+### Third-Party Data Transmission
 
-### Response Timeline
+When you use Poster Fly to test APIs:
+- **API Requests**: Data is sent directly from your device to the target API servers
+- **No Intermediary**: Poster Fly does not intercept, log, or store your API communications on external servers
+- **Third-Party Privacy**: Review the privacy policies of APIs you test
 
-- **Initial Response**: Within 48 hours
-- **Assessment**: Within 1 week
-- **Fix Development**: 2-4 weeks (depending on complexity)
-- **Public Disclosure**: After fix is released and deployed
+## 🔐 Compliance Considerations
 
-### Security Measures in Poster Fly
+### Data Protection Regulations
 
-#### Data Protection
-- **Secure Storage**: Platform-native secure storage for sensitive data
-- **Encryption**: All API tokens and secrets are encrypted at rest
-- **No Plain Text**: Sensitive variables marked as secrets are never logged
-- **Memory Protection**: Sensitive data cleared from memory after use
+#### GDPR (European Union)
+If testing APIs with EU personal data:
+- Ensure you have lawful basis for processing
+- Implement appropriate data protection measures
+- Consider data minimization principles
+- Document processing activities
 
-#### Network Security
-- **TLS/SSL**: All network communications use TLS 1.2 or higher
-- **Certificate Validation**: Full SSL certificate validation enabled by default
-- **Request Validation**: Input validation and sanitization
-- **Timeout Protection**: Configurable request timeouts to prevent DoS
+#### CCPA (California)
+If testing APIs with California resident data:
+- Ensure compliance with consumer privacy rights
+- Implement appropriate security measures
+- Consider data retention and deletion policies
 
-#### Authentication & Authorization
-- **Token Management**: Secure token storage and automatic refresh
-- **Multiple Auth Types**: Support for various authentication methods
-- **Scope Isolation**: Variable scoping prevents data leakage between collections
+#### Other Jurisdictions
+Consult local data protection laws and regulations applicable to your testing activities.
 
-#### Input Validation
-- **Parameter Sanitization**: All user inputs are validated and sanitized
-- **URL Validation**: Request URLs are validated before execution
-- **File Type Validation**: Imported files are validated for type and structure
-- **Size Limits**: File uploads and requests have size limits
+## 🚨 Reporting Security Issues
 
-## Security Best Practices for Users
+### Vulnerability Disclosure
 
-### API Key Management
-- Never commit API keys or tokens to version control
-- Use environment variables or secure storage for sensitive data
-- Regularly rotate API keys and authentication tokens
-- Mark sensitive variables as "secret" in the app
+If you discover a security vulnerability in Poster Fly:
 
-### Collection Sharing
-- Review collections before sharing to ensure no sensitive data
-- Use collection-scoped variables instead of global for sensitive data
-- Export collections without including secret variables
+1. **Do NOT** create a public GitHub issue
+2. **Do NOT** disclose the vulnerability publicly
+3. **DO** email security details to: [your-security-email]
+4. **DO** provide detailed information about the vulnerability
+5. **DO** allow reasonable time for response and fixes
 
-### Network Security
-- Use HTTPS endpoints whenever possible
-- Verify SSL certificates are properly validated
-- Be cautious when testing against development/staging environments
-- Use VPN when testing internal APIs on public networks
+### What to Include in Security Reports
 
-### Device Security
-- Use device lock screens and biometric authentication
-- Keep the app and operating system updated
-- Don't install the app on compromised or rooted devices
-- Log out of shared devices
+- Description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact assessment
+- Suggested fix (if available)
+- Your contact information for follow-up
 
-## Known Security Considerations
+## 📋 Security Checklist for Users
 
-### Platform-Specific
-- **Android**: App data stored in app-specific directory (requires root to access)
-- **iOS**: Keychain services used for secure storage
-- **Windows**: DPAPI used for credential protection
-- **macOS**: Keychain services used for secure storage
+Before using Poster Fly in production or with sensitive data:
 
-### Third-Party Dependencies
-- Regular security audits of NuGet packages
-- Automated dependency vulnerability scanning
-- Prompt updates for security-related package updates
+### Environment Setup
+- [ ] Testing on secure, updated devices
+- [ ] Using test/sandbox API environments when possible
+- [ ] Proper network security (avoid public WiFi for sensitive testing)
+- [ ] Updated operating system and security patches
 
-### Limitations
-- **Local Storage**: Data is stored locally on device (not cloud-synced by default)
-- **Network Inspection**: Users can inspect network traffic (intended behavior)
-- **Debug Builds**: Debug builds may include additional logging (development only)
+### Credential Management  
+- [ ] API keys stored securely and not shared
+- [ ] Using least-privilege access for API credentials
+- [ ] Regular rotation of API keys and tokens
+- [ ] Separate credentials for development/testing/production
 
-## Security Updates
+### Data Handling
+- [ ] Understanding what data will be processed during testing
+- [ ] Compliance with applicable data protection regulations
+- [ ] Proper data retention and deletion policies
+- [ ] Permission to test with third-party APIs
 
-### Notification Channels
-- GitHub Security Advisories
-- Release notes with security indicators
-- In-app notifications for critical updates
+### Application Security
+- [ ] Using the latest version of Poster Fly
+- [ ] Regular review and cleanup of stored request history
+- [ ] Proper device security (screen locks, encryption)
+- [ ] Understanding of local data storage implications
 
-### Update Process
-1. Security vulnerability identified
-2. Fix developed and tested
-3. Security advisory published (after fix available)
-4. App store updates released
-5. Users notified through multiple channels
+## 📞 Additional Resources
 
-## Compliance & Standards
-
-### Privacy
-- No telemetry or analytics collection without explicit consent
-- All data processing happens locally on device
-- No automatic cloud synchronization of API collections
-- Users control all data sharing and export
-
-### Industry Standards
-- Follow OWASP Mobile Security guidelines
-- Implement secure coding practices
-- Regular security code reviews
-- Automated security testing in CI/CD pipeline
-
-## Security Research
-
-We welcome security research on Poster Fly. Please follow responsible disclosure:
-
-### Scope
-**In Scope:**
-- Authentication bypass
-- Data injection attacks
-- Privilege escalation
-- Sensitive data exposure
-- Network security issues
-
-**Out of Scope:**
-- Social engineering attacks
-- Physical device attacks
-- Denial of service (unless critical)
-- Issues requiring physical access to unlocked device
-
-### Recognition
-- Security researchers will be credited in release notes (with permission)
-- Hall of fame page for significant contributions
-- Coordinated disclosure timeline respecting researcher preferences
-
-## Contact Information
-
-- **Security Team**: security@posterfly.com (replace with actual contact)
-- **General Contact**: support@posterfly.com
-- **GitHub Issues**: For non-security bugs only
-- **Documentation**: This security policy and related docs
+- **General Security**: Review your organization's security policies
+- **API Security**: Consult OWASP API Security guidelines
+- **Data Protection**: Seek legal advice for compliance requirements
+- **Privacy Policies**: Review third-party API privacy policies
 
 ---
 
-**Last Updated**: August 8, 2026
-**Version**: 1.0
+**Remember**: Security is a shared responsibility. While we strive to build secure software, your implementation and usage practices are crucial for maintaining security and privacy.
 
-This security policy may be updated periodically. Please check back regularly for the latest version.
+**Last Updated**: December 2024

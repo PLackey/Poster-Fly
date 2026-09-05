@@ -26,7 +26,14 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/appicon.appiconset</string>
+	<!-- Network usage description for API testing -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict/>
+	</dict>
+	<!-- Optional: Add usage descriptions if needed for App Store -->
+	<key>NSNetworkUsageDescription</key>
+	<string>This app needs network access to test REST APIs, GraphQL queries, and gRPC services as configured by the user.</string>
 </dict>
 </plist>

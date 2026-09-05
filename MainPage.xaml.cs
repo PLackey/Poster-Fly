@@ -9,6 +9,6 @@ public partial class MainPage : ContentPage
 
 	private async void OnStartClicked(object? sender, EventArgs e)
 	{
-		await DisplayAlertAsync("Poster Fly", "Welcome! API testing features coming soon.", "OK");
+		await DisplayAlert("Poster Fly", "Welcome! API testing features coming soon.", "OK");
 	}
 }

@@ -9,13 +9,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 [![MAUI](https://img.shields.io/badge/MAUI-Cross--Platform-blue.svg)](https://dotnet.microsoft.com/apps/maui)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/your-username/Poster-Fly)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/PLackey/Poster-Fly)
+
+**⚠️ LEGAL NOTICE**: This software is provided "AS IS" without warranty. **US users**: Max liability $100. **UK users**: Consumer rights preserved, business liability £1,000 max. [Full Disclaimer →](DISCLAIMER.md)
 
 </div>
 
 ## 🚀 Overview
 
 Poster Fly is a comprehensive API testing and collection management application that provides developers and QA engineers with a powerful tool for testing REST APIs, GraphQL queries, and gRPC services. Built with .NET MAUI, it runs seamlessly across Android, iOS, Windows, and macOS platforms.
+
+> **⚠️ Important**: This software is provided "AS IS" without warranty. See our [DISCLAIMER](DISCLAIMER.md) for important legal information regarding warranty disclaimers and liability limitations for US and UK users.
 
 ### ✨ Key Features
 
@@ -306,6 +310,26 @@ We welcome contributions! Please see our contributing guidelines:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## ⚠️ Disclaimer
+
+**IMPORTANT**: Poster Fly is provided "AS IS" without warranty of any kind. Please read our comprehensive [DISCLAIMER](DISCLAIMER.md) for important information about:
+
+- **Warranty disclaimers** for US and UK users
+- **Limitation of liability** provisions  
+- **Data security responsibilities** when testing APIs
+- **Third-party service interactions**
+
+**Key Points**:
+- ✅ Free and open-source software
+- ⚠️ No warranties or guarantees provided
+- 🔒 You are responsible for securing your API credentials and data
+- 📋 Must comply with applicable data protection laws (GDPR, CCPA, etc.)
+- 🚫 Not liable for data breaches or third-party service issues
+
+**For Business Users**: Limited liability provisions apply. See full [DISCLAIMER](DISCLAIMER.md) for complete terms.
+
+**For Consumer Users**: Your statutory rights under applicable consumer protection laws are not affected.
+
 ```
 MIT License
 
@@ -316,10 +340,18 @@ of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to do so, subject to the following conditions:
+furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 ## 📞 Support
