@@ -46,7 +46,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -138,7 +138,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -166,8 +166,8 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        dotnet-version: '9.0.x'  # Use .NET 9 for Windows to avoid deprecated Mono runtime
+        include-prerelease: false
         
     - name: Restore MAUI Windows workloads
       run: |
@@ -188,7 +188,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -204,7 +204,7 @@ jobs:
         fi
       
     - name: Test Windows build
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore
+      run: dotnet build PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 --no-restore
 
   # Comment on PR with build results
   pr-comment:

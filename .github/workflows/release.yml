@@ -77,7 +77,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -138,8 +138,8 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        dotnet-version: '9.0.x'  # Use .NET 9 for Windows to avoid deprecated Mono runtime
+        include-prerelease: false
         
     - name: Restore MAUI Windows workloads
       run: |
@@ -160,7 +160,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -194,7 +194,7 @@ jobs:
         (Get-Content PosterFly.csproj) -replace '<ApplicationVersion>.*</ApplicationVersion>', '<ApplicationVersion>${{ github.run_number }}</ApplicationVersion>' | Set-Content PosterFly.csproj
       
     - name: Build Windows MSIX
-      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
+      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net9.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
       
     - name: Upload Windows Release Artifacts
       uses: actions/upload-artifact@v4
@@ -241,7 +241,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \

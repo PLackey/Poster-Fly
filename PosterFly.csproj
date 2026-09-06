@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst;net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst;net10.0-windows10.0.19041.0;net9.0-windows10.0.19041.0</TargetFrameworks></TargetFrameworks>
+		
+		<!-- Disable Mono runtime for Windows - deprecated in .NET 9+ -->
+		<UseMonoRuntime>false</UseMonoRuntime>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -13,6 +16,7 @@
 		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-ios'">ios-arm64;iossimulator-x64;iossimulator-arm64</RuntimeIdentifiers>
 		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-android'">android-arm64;android-x64</RuntimeIdentifiers>
 		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">win-x64;win-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net9.0-windows10.0.19041.0'">win-x64;win-arm64</RuntimeIdentifiers>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>PosterFly</RootNamespace>

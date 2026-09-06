@@ -137,8 +137,8 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        dotnet-version: '9.0.x'  # Use .NET 9 for Windows to avoid deprecated Mono runtime
+        include-prerelease: false
         
     - name: Restore MAUI Windows workloads
       run: |
@@ -179,17 +179,17 @@ jobs:
         Write-Host "Restoring all target frameworks..."
         dotnet restore PosterFly.csproj --force --no-cache
         
-        # Then restore specifically for Windows with RuntimeIdentifier
+        # Then restore specifically for Windows with RuntimeIdentifier (.NET 9)
         Write-Host "Restoring Windows target with RuntimeIdentifier..."
-        dotnet restore PosterFly.csproj --force /p:TargetFramework=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
+        dotnet restore PosterFly.csproj --force /p:TargetFramework=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         
-        # Build Windows target
+        # Build Windows target (.NET 9)
         Write-Host "Building Windows target..."
-        dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 -v normal
+        dotnet build PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 -v normal
       
     - name: Publish Windows MSIX (Release)
       if: startsWith(github.ref, 'refs/tags/')
-      run: dotnet publish PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
+      run: dotnet publish PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
       
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
