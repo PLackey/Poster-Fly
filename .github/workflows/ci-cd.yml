@@ -95,7 +95,7 @@ jobs:
         
         # Now restore dependencies with specific target framework
         echo "Restoring dependencies for Android target..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android /p:RuntimeIdentifier=android-arm64
       
     - name: Build Android APK
       run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
@@ -156,10 +156,20 @@ jobs:
         
         # Restore dependencies for Windows
         Write-Host "Restoring dependencies for Windows..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
       
     - name: Build Windows MSIX (Unpackaged)
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore
+      run: |
+        # Clean any previous build artifacts first
+        dotnet clean PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0
+        
+        # Force a fresh restore with RuntimeIdentifier
+        Write-Host "Force restoring with RuntimeIdentifier for Windows..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
+        
+        # Build with verbose output for debugging
+        Write-Host "Building Windows target..."
+        dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore -v normal
       
     - name: Publish Windows MSIX (Release)
       if: startsWith(github.ref, 'refs/tags/')
@@ -205,12 +215,22 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
         
-        # Now restore dependencies for macCatalyst
-        echo "Restoring dependencies for macCatalyst..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
+        # Now restore dependencies for macCatalyst with RuntimeIdentifier
+        echo "Restoring dependencies for macCatalyst with RuntimeIdentifier..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst /p:RuntimeIdentifier=maccatalyst-x64
       
     - name: Build macOS (macCatalyst only)
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore
+      run: |
+        # Clean any previous build artifacts first
+        dotnet clean PosterFly.csproj -c Release -f net10.0-maccatalyst
+        
+        # Force a fresh restore with RuntimeIdentifier
+        echo "Force restoring with RuntimeIdentifier..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst /p:RuntimeIdentifier=maccatalyst-x64
+        
+        # Build with verbose output for debugging
+        echo "Building macCatalyst target..."
+        dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore -v normal
       
     - name: Upload macOS artifacts
       uses: actions/upload-artifact@v4
@@ -251,12 +271,22 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
         
-        # Now restore dependencies for iOS (we'll use iOS target framework)
+        # Now restore dependencies for iOS with RuntimeIdentifier
         echo "Restoring dependencies for iOS..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios /p:RuntimeIdentifier=iossimulator-x64
       
     - name: Build iOS (without signing)
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=ios-arm64
+      run: |
+        # Clean any previous build artifacts first
+        dotnet clean PosterFly.csproj -c Release -f net10.0-ios
+        
+        # Force a fresh restore with RuntimeIdentifier for iOS
+        echo "Force restoring with RuntimeIdentifier..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios /p:RuntimeIdentifier=iossimulator-x64
+        
+        # Build iOS without signing (use simulator target for CI)
+        echo "Building iOS target..."
+        dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=iossimulator-x64
       continue-on-error: true  # iOS builds may fail without proper certificates
       
     - name: Upload iOS artifacts

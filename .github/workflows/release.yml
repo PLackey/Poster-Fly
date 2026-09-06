@@ -76,7 +76,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -88,7 +88,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for iOS and macCatalyst..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios" /p:RuntimeIdentifiers="maccatalyst-x64;maccatalyst-arm64;ios-arm64;iossimulator-x64;iossimulator-arm64"
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -158,7 +158,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -170,7 +170,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for iOS and macCatalyst..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios" /p:RuntimeIdentifiers="maccatalyst-x64;maccatalyst-arm64;ios-arm64;iossimulator-x64;iossimulator-arm64"
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -238,7 +238,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -250,7 +250,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for iOS and macCatalyst..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios" /p:RuntimeIdentifiers="maccatalyst-x64;maccatalyst-arm64;ios-arm64;iossimulator-x64;iossimulator-arm64"
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
