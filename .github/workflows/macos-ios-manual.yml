@@ -68,7 +68,7 @@ jobs:
       continue-on-error: true
       
     - name: Upload macOS/iOS artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: macos-ios-manual-build
         path: |
