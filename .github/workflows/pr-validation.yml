@@ -6,7 +6,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '10.0.x'
 
 jobs:
   validate-pr:
@@ -23,6 +23,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Restore MAUI workloads
       run: |
@@ -45,7 +46,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -108,6 +109,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -136,7 +138,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -165,6 +167,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Restore MAUI Windows workloads
       run: |
@@ -185,7 +188,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \

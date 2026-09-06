@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '8.0.x'
-  MAUI_VERSION: '8.0.x'
+  DOTNET_VERSION: '10.0.x'
+  MAUI_VERSION: '10.0.x'
 
 jobs:
   # Build and Test Job
@@ -25,6 +25,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Install workloads and restore dependencies
       run: |
@@ -70,6 +71,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -95,7 +97,7 @@ jobs:
         
         # Now restore dependencies with specific target framework
         echo "Restoring dependencies for Android target..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android /p:RuntimeIdentifier=android-arm64
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
       
     - name: Build Android APK
       run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
@@ -136,6 +138,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Restore MAUI Windows workloads
       run: |
@@ -211,6 +214,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Restore MAUI macOS workloads and dependencies
       run: |
@@ -228,22 +232,12 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
         
-        # Now restore dependencies for macCatalyst with RuntimeIdentifier
-        echo "Restoring dependencies for macCatalyst with RuntimeIdentifier..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst /p:RuntimeIdentifier=maccatalyst-x64
+        # Now restore dependencies for macCatalyst
+        echo "Restoring dependencies for macCatalyst..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
       
     - name: Build macOS (macCatalyst only)
-      run: |
-        # Clean any previous build artifacts first
-        dotnet clean PosterFly.csproj -c Release -f net10.0-maccatalyst
-        
-        # Force a fresh restore with RuntimeIdentifier
-        echo "Force restoring with RuntimeIdentifier..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst /p:RuntimeIdentifier=maccatalyst-x64
-        
-        # Build with verbose output for debugging
-        echo "Building macCatalyst target..."
-        dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore -v normal
+      run: dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore
       
     - name: Upload macOS artifacts
       uses: actions/upload-artifact@v4
@@ -267,6 +261,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Restore MAUI iOS workloads and dependencies
       run: |
@@ -284,22 +279,12 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
         
-        # Now restore dependencies for iOS with RuntimeIdentifier
+        # Now restore dependencies for iOS
         echo "Restoring dependencies for iOS..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios /p:RuntimeIdentifier=iossimulator-x64
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios
       
     - name: Build iOS (without signing)
-      run: |
-        # Clean any previous build artifacts first
-        dotnet clean PosterFly.csproj -c Release -f net10.0-ios
-        
-        # Force a fresh restore with RuntimeIdentifier for iOS
-        echo "Force restoring with RuntimeIdentifier..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios /p:RuntimeIdentifier=iossimulator-x64
-        
-        # Build iOS without signing (use simulator target for CI)
-        echo "Building iOS target..."
-        dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=iossimulator-x64
+      run: dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=iossimulator-x64
       continue-on-error: true  # iOS builds may fail without proper certificates
       
     - name: Upload iOS artifacts
@@ -352,6 +337,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        include-prerelease: true
         
     - name: Install workloads and restore dependencies for analysis
       run: |

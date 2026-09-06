@@ -8,9 +8,11 @@
 		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
 		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- Platform-specific RuntimeIdentifiers for CI builds -->
-		<!-- Note: RuntimeIdentifiers will be specified via command line in CI -->
-		<!-- This avoids conflicts with restore cache and allows explicit control -->
+		<!-- Platform-specific RuntimeIdentifiers for proper restore -->
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-maccatalyst'">maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-ios'">ios-arm64;iossimulator-x64;iossimulator-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-android'">android-arm64;android-x64</RuntimeIdentifiers>
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">win-x64;win-arm64</RuntimeIdentifiers>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>PosterFly</RootNamespace>
