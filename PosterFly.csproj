@@ -9,11 +9,8 @@
 		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- Platform-specific RuntimeIdentifiers for CI builds -->
-		<!-- Use specific RuntimeIdentifier for simpler CI builds -->
-		<RuntimeIdentifier Condition="'$(TargetFramework)' == 'net10.0-maccatalyst' and '$(RuntimeIdentifier)' == ''">maccatalyst-x64</RuntimeIdentifier>
-		<RuntimeIdentifier Condition="'$(TargetFramework)' == 'net10.0-ios' and '$(RuntimeIdentifier)' == ''">iossimulator-x64</RuntimeIdentifier>
-		<RuntimeIdentifier Condition="'$(TargetFramework)' == 'net10.0-android' and '$(RuntimeIdentifier)' == ''">android-arm64</RuntimeIdentifier>
-		<RuntimeIdentifier Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0' and '$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+		<!-- Note: RuntimeIdentifiers will be specified via command line in CI -->
+		<!-- This avoids conflicts with restore cache and allows explicit control -->
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>PosterFly</RootNamespace>
