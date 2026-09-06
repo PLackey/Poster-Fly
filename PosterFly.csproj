@@ -53,6 +53,10 @@
 		<!-- Suppress common nullable warnings -->
 		<WarningsNotAsErrors>CS8602;CS8604;CS8618;CS2002</WarningsNotAsErrors>
 		<NoWarn>CS8602;CS8604;CS8618;CS2002</NoWarn>
+
+		<!-- Android-specific properties to help with AAPT compilation -->
+		<AndroidUseAapt2 Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">true</AndroidUseAapt2>
+		<AndroidCreatePackagePerAbi Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">false</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 
 	<!-- Windows-specific configuration -->
@@ -70,7 +74,7 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\icon.png" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\Images\posterfly_logo.png" Color="#512BD4" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
