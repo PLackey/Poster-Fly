@@ -44,8 +44,8 @@ jobs:
         
     - name: Restore dependencies (Android only)
       run: |
-        # Only restore Android target framework for Ubuntu runner
-        dotnet restore PosterFly.csproj -f net10.0-android
+        # Restore with MSBuild properties to exclude iOS/macOS frameworks on Ubuntu
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
       
     - name: Build solution (Android only on Ubuntu)
       run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net10.0-android
@@ -91,8 +91,8 @@ jobs:
       
     - name: Restore dependencies (Android only)
       run: |
-        # Only restore Android target framework to avoid iOS dependencies
-        dotnet restore PosterFly.csproj -f net10.0-android
+        # Restore with MSBuild properties to exclude iOS/macOS frameworks on Ubuntu
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
       
     - name: Build Android APK
       run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
@@ -144,8 +144,8 @@ jobs:
       
     - name: Restore dependencies (Windows only)
       run: |
-        # Only restore Windows target framework
-        dotnet restore PosterFly.csproj -f net10.0-windows10.0.19041.0
+        # Restore with MSBuild properties to only include Windows framework
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
       
     - name: Build Windows MSIX (Unpackaged)
       run: dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore
@@ -189,8 +189,10 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (macCatalyst only)
+      run: |
+        # Restore macCatalyst framework on macOS runner
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
       
     - name: Build macOS (macCatalyst only)
       run: dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore
@@ -229,8 +231,10 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (macCatalyst only)
+      run: |
+        # Restore macCatalyst framework on macOS runner
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
       
     - name: Build iOS (without signing)
       run: dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=ios-arm64
@@ -298,8 +302,10 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (macCatalyst only)
+      run: |
+        # Restore macCatalyst framework on macOS runner
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
       
     - name: Run code analysis
       run: |

@@ -46,7 +46,8 @@ jobs:
       
     - name: Test updated dependencies
       run: |
-        dotnet restore PosterFly.csproj
+        # Restore Android framework only for Ubuntu runner
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         # Build only Android target on Ubuntu
         dotnet build PosterFly.csproj --configuration Release -f net10.0-android
       

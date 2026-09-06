@@ -32,8 +32,14 @@ jobs:
         dotnet workload install android || \
         echo "Android workload installation failed, but validation can continue..."
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (platform-specific)
+      run: |
+        # Use platform-specific restore based on runner
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        else
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        fi
       
     - name: Check code formatting
       run: |
@@ -98,8 +104,14 @@ jobs:
         dotnet workload install android || \
         echo "Android workload installation failed, but continuing..."
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (platform-specific)
+      run: |
+        # Use platform-specific restore based on runner
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        else
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        fi
       
     - name: Test Android build
       run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
@@ -122,8 +134,14 @@ jobs:
         # Only install Windows workload
         dotnet workload install windows
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (platform-specific)
+      run: |
+        # Use platform-specific restore based on runner
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        else
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        fi
       
     - name: Test Windows build
       run: dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore

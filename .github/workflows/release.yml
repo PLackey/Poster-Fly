@@ -63,8 +63,17 @@ jobs:
         dotnet workload install android || \
         echo "Android workload installation failed, but continuing..."
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (platform-specific for release)
+      run: |
+        # Use appropriate frameworks based on the job context
+        # This will be job-specific - Android job uses Android, Windows uses Windows, macOS uses macOS+iOS
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+        else
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        fi
       
     - name: Update version in project
       run: |
@@ -108,8 +117,17 @@ jobs:
         # Only install Windows workload
         dotnet workload install windows
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (platform-specific for release)
+      run: |
+        # Use appropriate frameworks based on the job context
+        # This will be job-specific - Android job uses Android, Windows uses Windows, macOS uses macOS+iOS
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+        else
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        fi
       
     - name: Update version in project
       shell: pwsh
@@ -151,8 +169,17 @@ jobs:
         dotnet workload install ios maccatalyst || \
         echo "macOS workload installation failed, but continuing..."
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (platform-specific for release)
+      run: |
+        # Use appropriate frameworks based on the job context
+        # This will be job-specific - Android job uses Android, Windows uses Windows, macOS uses macOS+iOS
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+        else
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        fi
       
     - name: Update version in project
       run: |
