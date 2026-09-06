@@ -63,15 +63,38 @@ jobs:
         dotnet workload install android || \
         echo "Android workload installation failed, but continuing..."
       
-    - name: Restore dependencies (platform-specific for release)
+    - name: Install workloads and restore dependencies
       run: |
+        echo "Installing workloads and restoring dependencies for release..."
         # Use appropriate frameworks based on the job context
-        # This will be job-specific - Android job uses Android, Windows uses Windows, macOS uses macOS+iOS
         if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "Installing Windows workload..."
+          dotnet workload install windows
+          echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "Installing iOS and macCatalyst workloads..."
+          sudo dotnet workload install ios maccatalyst || \
+          dotnet workload install ios maccatalyst || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for iOS and macCatalyst..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
         else
+          echo "Installing Android workload..."
+          sudo dotnet workload install android || \
+          dotnet workload install android || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for Android..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         fi
       
@@ -117,15 +140,38 @@ jobs:
         # Only install Windows workload
         dotnet workload install windows
       
-    - name: Restore dependencies (platform-specific for release)
+    - name: Install workloads and restore dependencies
       run: |
+        echo "Installing workloads and restoring dependencies for release..."
         # Use appropriate frameworks based on the job context
-        # This will be job-specific - Android job uses Android, Windows uses Windows, macOS uses macOS+iOS
         if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "Installing Windows workload..."
+          dotnet workload install windows
+          echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "Installing iOS and macCatalyst workloads..."
+          sudo dotnet workload install ios maccatalyst || \
+          dotnet workload install ios maccatalyst || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for iOS and macCatalyst..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
         else
+          echo "Installing Android workload..."
+          sudo dotnet workload install android || \
+          dotnet workload install android || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for Android..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         fi
       
@@ -169,15 +215,38 @@ jobs:
         dotnet workload install ios maccatalyst || \
         echo "macOS workload installation failed, but continuing..."
       
-    - name: Restore dependencies (platform-specific for release)
+    - name: Install workloads and restore dependencies
       run: |
+        echo "Installing workloads and restoring dependencies for release..."
         # Use appropriate frameworks based on the job context
-        # This will be job-specific - Android job uses Android, Windows uses Windows, macOS uses macOS+iOS
         if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "Installing Windows workload..."
+          dotnet workload install windows
+          echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "Installing iOS and macCatalyst workloads..."
+          sudo dotnet workload install ios maccatalyst || \
+          dotnet workload install ios maccatalyst || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for iOS and macCatalyst..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
         else
+          echo "Installing Android workload..."
+          sudo dotnet workload install android || \
+          dotnet workload install android || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for Android..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         fi
       

@@ -32,12 +32,26 @@ jobs:
         dotnet workload install android || \
         echo "Android workload installation failed, but validation can continue..."
       
-    - name: Restore dependencies (platform-specific)
+    - name: Install workloads and restore dependencies
       run: |
-        # Use platform-specific restore based on runner
+        echo "Installing workloads for PR validation..."
+        # Install appropriate workload based on runner OS
         if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "Installing Windows workload..."
+          dotnet workload install windows
+          echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         else
+          echo "Installing Android workload..."
+          sudo dotnet workload install android || \
+          dotnet workload install android || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for Android..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         fi
       
@@ -104,12 +118,26 @@ jobs:
         dotnet workload install android || \
         echo "Android workload installation failed, but continuing..."
       
-    - name: Restore dependencies (platform-specific)
+    - name: Install workloads and restore dependencies
       run: |
-        # Use platform-specific restore based on runner
+        echo "Installing workloads for PR validation..."
+        # Install appropriate workload based on runner OS
         if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "Installing Windows workload..."
+          dotnet workload install windows
+          echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         else
+          echo "Installing Android workload..."
+          sudo dotnet workload install android || \
+          dotnet workload install android || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for Android..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         fi
       
@@ -134,12 +162,26 @@ jobs:
         # Only install Windows workload
         dotnet workload install windows
       
-    - name: Restore dependencies (platform-specific)
+    - name: Install workloads and restore dependencies
       run: |
-        # Use platform-specific restore based on runner
+        echo "Installing workloads for PR validation..."
+        # Install appropriate workload based on runner OS
         if [ "$RUNNER_OS" == "Windows" ]; then
+          echo "Installing Windows workload..."
+          dotnet workload install windows
+          echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         else
+          echo "Installing Android workload..."
+          sudo dotnet workload install android || \
+          dotnet workload install android || \
+          echo "Manual workload installation failed, trying workload restore..."
+          
+          dotnet workload restore PosterFly.csproj || \
+          sudo dotnet workload restore PosterFly.csproj || \
+          echo "Workload restore failed, but continuing..."
+          
+          echo "Restoring dependencies for Android..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
         fi
       

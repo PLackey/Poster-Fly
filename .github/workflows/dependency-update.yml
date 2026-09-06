@@ -21,13 +21,24 @@ jobs:
       with:
         dotnet-version: '8.0.x'
         
-    - name: Restore MAUI workloads
+    - name: Install MAUI workloads and test dependencies
       run: |
-        echo "Restoring workloads for dependency updates..."
-        # Only install Android workload for Ubuntu
+        echo "Installing workloads for dependency updates..."
+        # Install Android workload for Ubuntu
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        echo "Android workload installation failed, but dependency checks can continue..."
+        echo "Manual workload installation failed, trying workload restore..."
+        
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but dependency checks can continue..."
+        
+        # Restore Android framework only for Ubuntu runner
+        echo "Restoring and testing updated dependencies..."
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        
+        # Build only Android target on Ubuntu to verify dependencies
+        dotnet build PosterFly.csproj --configuration Release -f net10.0-android
       
     - name: List outdated packages
       run: dotnet list PosterFly.csproj package --outdated --format json > outdated-packages.json
@@ -43,13 +54,7 @@ jobs:
         dotnet add PosterFly.csproj package GraphQL.Client
         dotnet add PosterFly.csproj package CommunityToolkit.Mvvm
       continue-on-error: true
-      
-    - name: Test updated dependencies
-      run: |
-        # Restore Android framework only for Ubuntu runner
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
-        # Build only Android target on Ubuntu
-        dotnet build PosterFly.csproj --configuration Release -f net10.0-android
+
       
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v5

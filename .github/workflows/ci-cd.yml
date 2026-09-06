@@ -26,25 +26,24 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-    - name: Restore MAUI workloads
+    - name: Install workloads and restore dependencies
       run: |
-        # For .NET 8+ use workload restore which automatically installs required workloads
-        echo "Restoring workloads based on project requirements..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, trying manual installation..."
-        
-        # Fallback to manual installation if restore fails
+        # Install Android workload for Ubuntu
+        echo "Installing Android workloads..."
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        echo "Manual workload installation also failed, but continuing..."
+        echo "Manual Android workload installation failed, trying workload restore..."
+        
+        # Use workload restore as recommended
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but continuing..."
         
         # List installed workloads for debugging
         dotnet workload list || echo "Could not list workloads"
         
-    - name: Restore dependencies (Android only)
-      run: |
-        # Restore with MSBuild properties to exclude iOS/macOS frameworks on Ubuntu
+        # Restore dependencies for Android target
+        echo "Restoring dependencies for Android target..."
         dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
       
     - name: Build solution (Android only on Ubuntu)
@@ -78,20 +77,24 @@ jobs:
         distribution: 'microsoft'
         java-version: '17'
         
-    - name: Restore MAUI Android workloads
+    - name: Restore MAUI workloads and dependencies
       run: |
+        # Install Android workload first
         echo "Installing Android workloads for Ubuntu runner..."
-        # Only install Android workload for Ubuntu
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        echo "Android workload installation failed, but continuing..."
+        echo "Manual Android workload installation failed, trying workload restore..."
+        
+        # Use workload restore as recommended by the error
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but continuing..."
         
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
-      
-    - name: Restore dependencies (Android only)
-      run: |
-        # Restore with MSBuild properties to exclude iOS/macOS frameworks on Ubuntu
+        
+        # Now restore dependencies with specific target framework
+        echo "Restoring dependencies for Android target..."
         dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
       
     - name: Build Android APK
@@ -136,8 +139,12 @@ jobs:
         
     - name: Restore MAUI Windows workloads
       run: |
-        echo "Restoring Windows workloads based on project requirements..."
-        dotnet workload restore PosterFly.csproj
+        echo "Installing Windows workloads..."
+        dotnet workload install windows || \
+        echo "Windows workload installation failed, trying workload restore..."
+        
+        dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but continuing..."
         
         # List installed workloads
         dotnet workload list
@@ -291,21 +298,24 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-    - name: Restore MAUI workloads
+    - name: Install workloads and restore dependencies for analysis
       run: |
-        echo "Restoring workloads for code analysis..."
-        # Only install Android workload for Ubuntu code analysis
+        echo "Installing workloads for code analysis..."
+        # Install Android workload
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        echo "Android workload installation failed, but code analysis can continue..."
+        echo "Manual Android workload installation failed, trying workload restore..."
+        
+        # Use workload restore
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
+        echo "Workload restore failed, but continuing..."
         
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
-      
-    - name: Restore dependencies (macCatalyst only)
-      run: |
-        # Restore macCatalyst framework on macOS runner
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
+        
+        # Restore dependencies for Android target
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
       
     - name: Run code analysis
       run: |
