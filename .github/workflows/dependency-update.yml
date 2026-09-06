@@ -23,11 +23,11 @@ jobs:
         
     - name: Install MAUI workloads and test dependencies
       run: |
-        echo "Installing workloads for dependency updates..."
-        # Install Android workload for Ubuntu
-        sudo dotnet workload install android || \
-        dotnet workload install android || \
-        echo "Manual workload installation failed, trying workload restore..."
+        echo "Installing MAUI workloads for dependency updates..."
+        # Install complete MAUI workload for Ubuntu
+        sudo dotnet workload install maui || \
+        dotnet workload install maui || \
+        echo "Manual MAUI workload installation failed, trying workload restore..."
         
         dotnet workload restore PosterFly.csproj || \
         sudo dotnet workload restore PosterFly.csproj || \

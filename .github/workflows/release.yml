@@ -64,18 +64,23 @@ jobs:
         echo "Android workload installation failed, but continuing..."
       
     - name: Install workloads and restore dependencies
+      shell: bash
       run: |
         echo "Installing workloads and restoring dependencies for release..."
-        # Use appropriate frameworks based on the job context
+        # Use complete MAUI workload based on the job context
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Installing Windows workload..."
-          dotnet workload install windows
+          echo "Installing MAUI workload for Windows..."
+          dotnet workload install maui
+          if [ $? -ne 0 ]; then
+            echo "Manual workload installation failed, trying workload restore..."
+            dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
+          fi
           echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          echo "Installing iOS and macCatalyst workloads..."
-          sudo dotnet workload install ios maccatalyst || \
-          dotnet workload install ios maccatalyst || \
+          echo "Installing MAUI workload for macOS..."
+          sudo dotnet workload install maui || \
+          dotnet workload install maui || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -85,9 +90,9 @@ jobs:
           echo "Restoring dependencies for iOS and macCatalyst..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
         else
-          echo "Installing Android workload..."
-          sudo dotnet workload install android || \
-          dotnet workload install android || \
+          echo "Installing MAUI workload for Ubuntu..."
+          sudo dotnet workload install maui || \
+          dotnet workload install maui || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -141,18 +146,23 @@ jobs:
         dotnet workload install windows
       
     - name: Install workloads and restore dependencies
+      shell: bash
       run: |
         echo "Installing workloads and restoring dependencies for release..."
-        # Use appropriate frameworks based on the job context
+        # Use complete MAUI workload based on the job context
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Installing Windows workload..."
-          dotnet workload install windows
+          echo "Installing MAUI workload for Windows..."
+          dotnet workload install maui
+          if [ $? -ne 0 ]; then
+            echo "Manual workload installation failed, trying workload restore..."
+            dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
+          fi
           echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          echo "Installing iOS and macCatalyst workloads..."
-          sudo dotnet workload install ios maccatalyst || \
-          dotnet workload install ios maccatalyst || \
+          echo "Installing MAUI workload for macOS..."
+          sudo dotnet workload install maui || \
+          dotnet workload install maui || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -162,9 +172,9 @@ jobs:
           echo "Restoring dependencies for iOS and macCatalyst..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
         else
-          echo "Installing Android workload..."
-          sudo dotnet workload install android || \
-          dotnet workload install android || \
+          echo "Installing MAUI workload for Ubuntu..."
+          sudo dotnet workload install maui || \
+          dotnet workload install maui || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -216,18 +226,23 @@ jobs:
         echo "macOS workload installation failed, but continuing..."
       
     - name: Install workloads and restore dependencies
+      shell: bash
       run: |
         echo "Installing workloads and restoring dependencies for release..."
-        # Use appropriate frameworks based on the job context
+        # Use complete MAUI workload based on the job context
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Installing Windows workload..."
-          dotnet workload install windows
+          echo "Installing MAUI workload for Windows..."
+          dotnet workload install maui
+          if [ $? -ne 0 ]; then
+            echo "Manual workload installation failed, trying workload restore..."
+            dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
+          fi
           echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          echo "Installing iOS and macCatalyst workloads..."
-          sudo dotnet workload install ios maccatalyst || \
-          dotnet workload install ios maccatalyst || \
+          echo "Installing MAUI workload for macOS..."
+          sudo dotnet workload install maui || \
+          dotnet workload install maui || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -237,9 +252,9 @@ jobs:
           echo "Restoring dependencies for iOS and macCatalyst..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
         else
-          echo "Installing Android workload..."
-          sudo dotnet workload install android || \
-          dotnet workload install android || \
+          echo "Installing MAUI workload for Ubuntu..."
+          sudo dotnet workload install maui || \
+          dotnet workload install maui || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
