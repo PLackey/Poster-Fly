@@ -219,39 +219,6 @@ jobs:
     steps:
     - name: Placeholder
       run: echo "iOS build temporarily disabled due to Xcode version mismatch"
-        sudo dotnet workload install maui-ios || \
-        dotnet workload install maui-ios || \
-        echo "Manual iOS workload installation failed, trying workload restore..."
-        
-        # Use workload restore as recommended
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, but continuing..."
-        
-        # List installed workloads
-        dotnet workload list || echo "Could not list workloads"
-        
-        # Now restore dependencies for iOS
-        echo "Restoring dependencies for iOS..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-ios
-      
-    - name: Build iOS (without signing)
-      run: |
-        # Set environment variable to bypass Xcode version check
-        export XCODE_VERSION_OVERRIDE=26.5
-        export MAUI_FORCE_XCODE_VERSION=26.5
-        dotnet build PosterFly.csproj -c Release -f net9.0-ios --no-restore /p:BuildIpa=True /p:IgnoreXcodeVersionCheck=true
-      continue-on-error: true  # iOS builds may fail without proper certificates
-      
-    - name: Upload iOS artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ios-build
-        path: |
-          **/bin/Release/**/*.ipa
-          **/bin/Release/**/*.app
-        retention-days: 30
-      if: success()
 
   # Create GitHub Release (only on tags)
   create-release:
