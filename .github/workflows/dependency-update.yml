@@ -19,8 +19,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x'
-        include-prerelease: true
+        dotnet-version: '9.0.x'
         
     - name: Install MAUI workloads and test dependencies
       run: |
@@ -36,10 +35,10 @@ jobs:
         
         # Restore Android framework only for Ubuntu runner
         echo "Restoring and testing updated dependencies..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         
         # Build only Android target on Ubuntu to verify dependencies
-        dotnet build PosterFly.csproj --configuration Release -f net10.0-android
+        dotnet build PosterFly.csproj --configuration Release -f net9.0-android
       
     - name: List outdated packages
       run: dotnet list PosterFly.csproj package --outdated --format json > outdated-packages.json

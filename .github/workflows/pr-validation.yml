@@ -6,7 +6,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   validate-pr:
@@ -23,7 +23,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        include-prerelease: false
         
     - name: Restore MAUI workloads
       run: |
@@ -46,7 +46,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -58,7 +58,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for Android..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         fi
       
     - name: Check code formatting
@@ -68,7 +68,7 @@ jobs:
       continue-on-error: true
       
     - name: Build solution (Android only on Ubuntu)
-      run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net10.0-android
+      run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net9.0-android
       
     - name: Run static analysis
       run: |
@@ -109,7 +109,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        include-prerelease: false
         
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -138,7 +138,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -150,11 +150,11 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for Android..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         fi
       
     - name: Test Android build
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
+      run: dotnet build PosterFly.csproj -c Release -f net9.0-android --no-restore
 
   test-windows-build:
     runs-on: windows-latest
@@ -188,7 +188,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -200,7 +200,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for Android..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         fi
       
     - name: Test Windows build

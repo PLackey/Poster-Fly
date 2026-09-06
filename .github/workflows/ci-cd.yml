@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '10.0.x'
-  MAUI_VERSION: '10.0.x'
+  DOTNET_VERSION: '9.0.x'
+  MAUI_VERSION: '9.0.x'
 
 jobs:
   # Build and Test Job
@@ -25,7 +25,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
         
     - name: Install workloads and restore dependencies
       run: |
@@ -45,10 +44,10 @@ jobs:
         
         # Restore dependencies for Android target
         echo "Restoring dependencies for Android target..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
       
     - name: Build solution (Android only on Ubuntu)
-      run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net10.0-android
+      run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net9.0-android
       
     - name: Run tests (if any exist)
       run: |
@@ -71,7 +70,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
         
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -97,14 +95,14 @@ jobs:
         
         # Now restore dependencies with specific target framework
         echo "Restoring dependencies for Android target..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
       
     - name: Build Android APK
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
+      run: dotnet build PosterFly.csproj -c Release -f net9.0-android --no-restore
       
     - name: Build Android AAB (Release)
       if: startsWith(github.ref, 'refs/tags/')
-      run: dotnet publish PosterFly.csproj -c Release -f net10.0-android --no-restore -p:AndroidPackageFormat=aab
+      run: dotnet publish PosterFly.csproj -c Release -f net9.0-android --no-restore -p:AndroidPackageFormat=aab
       
     - name: Upload Android APK
       uses: actions/upload-artifact@v4
@@ -179,17 +177,17 @@ jobs:
         Write-Host "Restoring all target frameworks..."
         dotnet restore PosterFly.csproj --force --no-cache
         
-        # Then restore specifically for Windows with RuntimeIdentifier (.NET 9)
-        Write-Host "Restoring Windows target with RuntimeIdentifier..."
-        dotnet restore PosterFly.csproj --force /p:TargetFramework=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
+        # Then restore specifically for Windows (.NET 9)
+        Write-Host "Restoring Windows target..."
+        dotnet restore PosterFly.csproj --force /p:TargetFramework=net9.0-windows10.0.19041.0
         
         # Build Windows target (.NET 9)
         Write-Host "Building Windows target..."
-        dotnet build PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 -v normal
+        dotnet build PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 -v normal
       
     - name: Publish Windows MSIX (Release)
       if: startsWith(github.ref, 'refs/tags/')
-      run: dotnet publish PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 --no-restore -p:RuntimeIdentifier=win-x64 -p:WindowsPackageType=None
+      run: dotnet publish PosterFly.csproj -c Release -f net9.0-windows10.0.19041.0 --no-restore -p:WindowsPackageType=None
       
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
@@ -214,7 +212,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
         
     - name: Restore MAUI macOS workloads and dependencies
       run: |
@@ -234,10 +231,10 @@ jobs:
         
         # Now restore dependencies for macCatalyst
         echo "Restoring dependencies for macCatalyst..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-maccatalyst
       
     - name: Build macOS (macCatalyst only)
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-maccatalyst --no-restore
+      run: dotnet build PosterFly.csproj -c Release -f net9.0-maccatalyst --no-restore
       
     - name: Upload macOS artifacts
       uses: actions/upload-artifact@v4
@@ -261,7 +258,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
         
     - name: Restore MAUI iOS workloads and dependencies
       run: |
@@ -281,10 +277,10 @@ jobs:
         
         # Now restore dependencies for iOS
         echo "Restoring dependencies for iOS..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-ios
       
     - name: Build iOS (without signing)
-      run: dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=iossimulator-x64
+      run: dotnet build PosterFly.csproj -c Release -f net9.0-ios --no-restore /p:BuildIpa=True
       continue-on-error: true  # iOS builds may fail without proper certificates
       
     - name: Upload iOS artifacts
@@ -337,7 +333,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
         
     - name: Install workloads and restore dependencies for analysis
       run: |
@@ -356,12 +351,12 @@ jobs:
         dotnet workload list || echo "Could not list workloads"
         
         # Restore dependencies for Android target
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
       
     - name: Run code analysis
       run: |
         # Run built-in analyzers on Android target only (compatible with Ubuntu)
-        dotnet build PosterFly.csproj --configuration Release --verbosity normal --no-restore -f net10.0-android
+        dotnet build PosterFly.csproj --configuration Release --verbosity normal --no-restore -f net9.0-android
       
     - name: Security scan with CodeQL (if enabled)
       if: false  # Enable this by changing to 'true' and setting up CodeQL

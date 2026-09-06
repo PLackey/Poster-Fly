@@ -12,7 +12,7 @@ on:
         default: 'v1.0.0'
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '9.0.x'
   BUILD_CONFIGURATION: 'Release'
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        include-prerelease: false
         
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -77,7 +77,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -89,7 +89,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for iOS and macCatalyst..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net9.0-maccatalyst;net9.0-ios"
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -101,7 +101,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for Android..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         fi
       
     - name: Update version in project
@@ -110,10 +110,10 @@ jobs:
         sed -i 's/<ApplicationVersion>.*<\/ApplicationVersion>/<ApplicationVersion>${{ github.run_number }}<\/ApplicationVersion>/' PosterFly.csproj
       
     - name: Build Android APK
-      run: dotnet build PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-android --no-restore
+      run: dotnet build PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net9.0-android --no-restore
       
     - name: Build Android AAB for Play Store
-      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net10.0-android --no-restore -p:AndroidPackageFormat=aab -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=${{ secrets.ANDROID_KEYSTORE }} -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASS }} -p:AndroidSigningStorePass=${{ secrets.ANDROID_STORE_PASS }}
+      run: dotnet publish PosterFly.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net9.0-android --no-restore -p:AndroidPackageFormat=aab -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=${{ secrets.ANDROID_KEYSTORE }} -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASS }} -p:AndroidSigningStorePass=${{ secrets.ANDROID_STORE_PASS }}
       if: env.ANDROID_KEYSTORE != ''
       env:
         ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
@@ -160,7 +160,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -172,7 +172,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for iOS and macCatalyst..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net9.0-maccatalyst;net9.0-ios"
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -184,7 +184,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for Android..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         fi
       
     - name: Update version in project
@@ -218,7 +218,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
+        include-prerelease: false
         
     - name: Restore MAUI macOS workloads
       run: |
@@ -241,7 +241,7 @@ jobs:
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
           fi
           echo "Restoring dependencies for Windows..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64 /p:RuntimeIdentifier=win-x64
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-windows10.0.19041.0 /p:RuntimeIdentifier=win-x64
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "Installing iOS and macCatalyst MAUI workloads for macOS..."
           sudo dotnet workload install maui-ios maui-maccatalyst || \
@@ -253,7 +253,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for iOS and macCatalyst..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks="net10.0-maccatalyst;net10.0-ios"
+          dotnet restore PosterFly.csproj /p:TargetFrameworks="net9.0-maccatalyst;net9.0-ios"
         else
           echo "Installing Android MAUI workload for Ubuntu..."
           sudo dotnet workload install maui-android || \
@@ -265,7 +265,7 @@ jobs:
           echo "Workload restore failed, but continuing..."
           
           echo "Restoring dependencies for Android..."
-          dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-android
+          dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-android
         fi
       
     - name: Update version in project
