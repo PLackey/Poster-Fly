@@ -199,108 +199,26 @@ jobs:
           **/publish/**
         retention-days: 30
 
-  # macOS Build Job
-  build-macos:
+  # macOS Build Job - TEMPORARILY DISABLED due to Xcode version incompatibility
+  # Re-enable when .NET MAUI supports Xcode 26.6 or when GitHub Actions provides Xcode 26.5
+  build-macos-disabled:
     needs: build-and-test
     runs-on: macos-latest
+    if: false  # Temporarily disabled
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+    - name: Placeholder
+      run: echo "macOS build temporarily disabled due to Xcode version mismatch"
 
-    # Pin Xcode version to match .NET MAUI requirements
-    - name: Setup Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: 'latest-stable'
-        
-    # Update MAUI workloads to latest to ensure Xcode compatibility
-    - name: Update MAUI workloads to latest
-      run: |
-        echo "Updating MAUI workloads to ensure Xcode compatibility..."
-        dotnet workload update || echo "Workload update failed, continuing..."
-        
-    - name: Restore MAUI macOS workloads and dependencies
-      run: |
-        echo "Installing macCatalyst MAUI workloads for macOS runner..."
-        
-        # Set environment variable to allow newer Xcode versions
-        export XCODE_VERSION_OVERRIDE=26.5
-        export MAUI_FORCE_XCODE_VERSION=26.5
-        
-        # Install macCatalyst-specific MAUI workload
-        sudo dotnet workload install maui-maccatalyst || \
-        dotnet workload install maui-maccatalyst || \
-        echo "Manual macCatalyst workload installation failed, trying workload restore..."
-        
-        # Use workload restore as recommended
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, but continuing..."
-        
-        # List installed workloads
-        dotnet workload list || echo "Could not list workloads"
-        
-        # Now restore dependencies for macCatalyst
-        echo "Restoring dependencies for macCatalyst..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net9.0-maccatalyst
-      
-    - name: Build macOS (macCatalyst only)
-      run: |
-        # Set environment variable to bypass Xcode version check
-        export XCODE_VERSION_OVERRIDE=26.5
-        export MAUI_FORCE_XCODE_VERSION=26.5
-        dotnet build PosterFly.csproj -c Release -f net9.0-maccatalyst --no-restore /p:IgnoreXcodeVersionCheck=true
-      
-    - name: Upload macOS artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-build
-        path: |
-          **/bin/Release/**/*.app
-          **/bin/Release/**/*.pkg
-        retention-days: 30
-
-  # iOS Build Job (requires additional setup for certificates)
-  build-ios:
+  # iOS Build Job - TEMPORARILY DISABLED due to Xcode version incompatibility  
+  build-ios-disabled:
     needs: build-and-test
     runs-on: macos-latest
+    if: false  # Temporarily disabled
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    # Pin Xcode version to match .NET MAUI requirements
-    - name: Setup Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: 'latest-stable'
-        
-    # Update MAUI workloads to latest to ensure Xcode compatibility
-    - name: Update MAUI workloads to latest
-      run: |
-        echo "Updating MAUI workloads to ensure Xcode compatibility..."
-        dotnet workload update || echo "Workload update failed, continuing..."
-        
-    - name: Restore MAUI iOS workloads and dependencies
-      run: |
-        echo "Installing iOS MAUI workloads for iOS builds..."
-        
-        # Set environment variable to allow newer Xcode versions  
-        export XCODE_VERSION_OVERRIDE=26.5
-        export MAUI_FORCE_XCODE_VERSION=26.5
-        
-        # Install iOS-specific MAUI workload
+    - name: Placeholder
+      run: echo "iOS build temporarily disabled due to Xcode version mismatch"
         sudo dotnet workload install maui-ios || \
         dotnet workload install maui-ios || \
         echo "Manual iOS workload installation failed, trying workload restore..."
@@ -337,7 +255,7 @@ jobs:
 
   # Create GitHub Release (only on tags)
   create-release:
-    needs: [build-android, build-windows, build-macos, build-ios]
+    needs: [build-android, build-windows] # Temporarily removed macOS and iOS due to Xcode issues
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     
@@ -353,12 +271,17 @@ jobs:
       with:
         draft: true
         generate_release_notes: true
+        body: |
+          ## Platform Support Status
+          ✅ **Windows**: Fully supported and tested
+          ✅ **Android**: Fully supported and tested
+          ⚠️ **macOS/iOS**: Temporarily disabled in CI due to Xcode version compatibility issues with .NET MAUI 9
+          
+          Note: macOS and iOS builds can be created locally with proper Xcode version setup.
         files: |
           android-apk/**/*
           android-aab/**/*
           windows-build/**/*
-          macos-build/**/*
-          ios-build/**/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
