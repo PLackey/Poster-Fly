@@ -42,8 +42,10 @@ jobs:
         # List installed workloads for debugging
         dotnet workload list || echo "Could not list workloads"
         
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (Android only)
+      run: |
+        # Only restore Android target framework for Ubuntu runner
+        dotnet restore PosterFly.csproj -f net10.0-android
       
     - name: Build solution (Android only on Ubuntu)
       run: dotnet build PosterFly.csproj --configuration Release --no-restore -f net10.0-android
@@ -78,23 +80,19 @@ jobs:
         
     - name: Restore MAUI Android workloads
       run: |
-        echo "Restoring Android workloads based on project requirements..."
-        dotnet workload restore PosterFly.csproj || \
-        sudo dotnet workload restore PosterFly.csproj || \
-        echo "Workload restore failed, trying manual installation..."
-        
-        # Fallback to manual installation if restore fails
+        echo "Installing Android workloads for Ubuntu runner..."
+        # Only install Android workload for Ubuntu
         sudo dotnet workload install android || \
         dotnet workload install android || \
-        sudo dotnet workload install maui-android || \
-        dotnet workload install maui-android || \
-        echo "Manual Android workload installation also failed, but continuing..."
+        echo "Android workload installation failed, but continuing..."
         
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (Android only)
+      run: |
+        # Only restore Android target framework to avoid iOS dependencies
+        dotnet restore PosterFly.csproj -f net10.0-android
       
     - name: Build Android APK
       run: dotnet build PosterFly.csproj -c Release -f net10.0-android --no-restore
@@ -144,8 +142,10 @@ jobs:
         # List installed workloads
         dotnet workload list
       
-    - name: Restore dependencies
-      run: dotnet restore PosterFly.csproj
+    - name: Restore dependencies (Windows only)
+      run: |
+        # Only restore Windows target framework
+        dotnet restore PosterFly.csproj -f net10.0-windows10.0.19041.0
       
     - name: Build Windows MSIX (Unpackaged)
       run: dotnet build PosterFly.csproj -c Release -f net10.0-windows10.0.19041.0 --no-restore
