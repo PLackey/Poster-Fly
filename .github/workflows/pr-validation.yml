@@ -36,10 +36,10 @@ jobs:
       shell: bash
       run: |
         echo "Installing workloads for PR validation..."
-        # Install complete MAUI workload based on runner OS
+        # Install platform-specific MAUI workload based on runner OS
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Installing MAUI workload for Windows..."
-          dotnet workload install maui
+          echo "Installing Windows MAUI workload..."
+          dotnet workload install maui-windows
           if [ $? -ne 0 ]; then
             echo "Manual workload installation failed, trying workload restore..."
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
@@ -47,9 +47,9 @@ jobs:
           echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         else
-          echo "Installing MAUI workload for Ubuntu..."
-          sudo dotnet workload install maui || \
-          dotnet workload install maui || \
+          echo "Installing Android MAUI workload for Ubuntu..."
+          sudo dotnet workload install maui-android || \
+          dotnet workload install maui-android || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -127,10 +127,10 @@ jobs:
       shell: bash
       run: |
         echo "Installing workloads for PR validation..."
-        # Install complete MAUI workload based on runner OS
+        # Install platform-specific MAUI workload based on runner OS
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Installing MAUI workload for Windows..."
-          dotnet workload install maui
+          echo "Installing Windows MAUI workload..."
+          dotnet workload install maui-windows
           if [ $? -ne 0 ]; then
             echo "Manual workload installation failed, trying workload restore..."
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
@@ -138,9 +138,9 @@ jobs:
           echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         else
-          echo "Installing MAUI workload for Ubuntu..."
-          sudo dotnet workload install maui || \
-          dotnet workload install maui || \
+          echo "Installing Android MAUI workload for Ubuntu..."
+          sudo dotnet workload install maui-android || \
+          dotnet workload install maui-android || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \
@@ -176,10 +176,10 @@ jobs:
       shell: bash
       run: |
         echo "Installing workloads for PR validation..."
-        # Install complete MAUI workload based on runner OS
+        # Install platform-specific MAUI workload based on runner OS
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Installing MAUI workload for Windows..."
-          dotnet workload install maui
+          echo "Installing Windows MAUI workload..."
+          dotnet workload install maui-windows
           if [ $? -ne 0 ]; then
             echo "Manual workload installation failed, trying workload restore..."
             dotnet workload restore PosterFly.csproj || echo "Workload restore failed, but continuing..."
@@ -187,9 +187,9 @@ jobs:
           echo "Restoring dependencies for Windows..."
           dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-windows10.0.19041.0
         else
-          echo "Installing MAUI workload for Ubuntu..."
-          sudo dotnet workload install maui || \
-          dotnet workload install maui || \
+          echo "Installing Android MAUI workload for Ubuntu..."
+          sudo dotnet workload install maui-android || \
+          dotnet workload install maui-android || \
           echo "Manual workload installation failed, trying workload restore..."
           
           dotnet workload restore PosterFly.csproj || \

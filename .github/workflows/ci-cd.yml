@@ -28,11 +28,11 @@ jobs:
         
     - name: Install workloads and restore dependencies
       run: |
-        # Install complete MAUI workload for Ubuntu
-        echo "Installing MAUI workloads..."
-        sudo dotnet workload install maui || \
-        dotnet workload install maui || \
-        echo "Manual MAUI workload installation failed, trying workload restore..."
+        # Install Android-specific MAUI workload for Ubuntu
+        echo "Installing Android MAUI workloads..."
+        sudo dotnet workload install maui-android || \
+        dotnet workload install maui-android || \
+        echo "Manual Android workload installation failed, trying workload restore..."
         
         # Use workload restore as recommended
         dotnet workload restore PosterFly.csproj || \
@@ -79,15 +79,15 @@ jobs:
         
     - name: Restore MAUI workloads and dependencies
       run: |
-        # Install complete MAUI workload (includes all platforms)
-        echo "Installing MAUI workloads for Ubuntu runner..."
-        sudo dotnet workload install maui || `
-        dotnet workload install maui || `
-        echo "Manual MAUI workload installation failed, trying workload restore..."
+        # Install Android-specific MAUI workload for Ubuntu runner
+        echo "Installing Android MAUI workloads for Ubuntu runner..."
+        sudo dotnet workload install maui-android || \
+        dotnet workload install maui-android || \
+        echo "Manual Android workload installation failed, trying workload restore..."
         
         # Use workload restore as recommended by the error
-        dotnet workload restore PosterFly.csproj || `
-        sudo dotnet workload restore PosterFly.csproj || `
+        dotnet workload restore PosterFly.csproj || \
+        sudo dotnet workload restore PosterFly.csproj || \
         echo "Workload restore failed, but continuing..."
         
         # List installed workloads
@@ -139,11 +139,11 @@ jobs:
         
     - name: Restore MAUI Windows workloads
       run: |
-        echo "Installing MAUI workloads for Windows..."
+        echo "Installing Windows MAUI workloads..."
         try {
-          dotnet workload install maui
+          dotnet workload install maui-windows
         } catch {
-          Write-Host "MAUI workload installation failed, trying workload restore..."
+          Write-Host "Windows MAUI workload installation failed, trying workload restore..."
           try {
             dotnet workload restore PosterFly.csproj
           } catch {
@@ -191,11 +191,11 @@ jobs:
         
     - name: Restore MAUI macOS workloads and dependencies
       run: |
-        echo "Installing MAUI workloads for macOS runner..."
-        # Install complete MAUI workload (includes iOS and macCatalyst)
-        sudo dotnet workload install maui || \
-        dotnet workload install maui || \
-        echo "Manual MAUI workload installation failed, trying workload restore..."
+        echo "Installing macCatalyst MAUI workloads for macOS runner..."
+        # Install macCatalyst-specific MAUI workload
+        sudo dotnet workload install maui-maccatalyst || \
+        dotnet workload install maui-maccatalyst || \
+        echo "Manual macCatalyst workload installation failed, trying workload restore..."
         
         # Use workload restore as recommended
         dotnet workload restore PosterFly.csproj || \
@@ -237,11 +237,11 @@ jobs:
         
     - name: Restore MAUI iOS workloads and dependencies
       run: |
-        echo "Installing MAUI workloads for iOS builds..."
-        # Install complete MAUI workload (includes iOS and macCatalyst)
-        sudo dotnet workload install maui || \
-        dotnet workload install maui || \
-        echo "Manual MAUI workload installation failed, trying workload restore..."
+        echo "Installing iOS MAUI workloads for iOS builds..."
+        # Install iOS-specific MAUI workload
+        sudo dotnet workload install maui-ios || \
+        dotnet workload install maui-ios || \
+        echo "Manual iOS workload installation failed, trying workload restore..."
         
         # Use workload restore as recommended
         dotnet workload restore PosterFly.csproj || \
@@ -251,9 +251,9 @@ jobs:
         # List installed workloads
         dotnet workload list || echo "Could not list workloads"
         
-        # Now restore dependencies for iOS (we'll use macCatalyst for iOS compatibility)
+        # Now restore dependencies for iOS (we'll use iOS target framework)
         echo "Restoring dependencies for iOS..."
-        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-maccatalyst
+        dotnet restore PosterFly.csproj /p:TargetFrameworks=net10.0-ios
       
     - name: Build iOS (without signing)
       run: dotnet build PosterFly.csproj -c Release -f net10.0-ios --no-restore /p:BuildIpa=True /p:RuntimeIdentifier=ios-arm64
@@ -312,11 +312,11 @@ jobs:
         
     - name: Install workloads and restore dependencies for analysis
       run: |
-        echo "Installing MAUI workloads for code analysis..."
-        # Install complete MAUI workload
-        sudo dotnet workload install maui || \
-        dotnet workload install maui || \
-        echo "Manual MAUI workload installation failed, trying workload restore..."
+        echo "Installing Android MAUI workloads for code analysis..."
+        # Install Android-specific MAUI workload
+        sudo dotnet workload install maui-android || \
+        dotnet workload install maui-android || \
+        echo "Manual Android workload installation failed, trying workload restore..."
         
         # Use workload restore
         dotnet workload restore PosterFly.csproj || \
