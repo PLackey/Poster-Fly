@@ -76,7 +76,7 @@
 		
 		<!-- GraphQL -->
 		<PackageReference Include="GraphQL.Client" Version="6.0.2" />
-		<PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.0.2" />
+		<PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />
 		
 		<!-- Additional utilities -->
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
