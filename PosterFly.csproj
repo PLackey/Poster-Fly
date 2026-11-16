@@ -79,7 +79,7 @@
 		<PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.0.2" />
 		
 		<!-- Additional utilities -->
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 	</ItemGroup>
 
 	<!-- Windows-specific packages -->
