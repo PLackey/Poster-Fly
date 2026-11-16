@@ -75,7 +75,7 @@
 		<PackageReference Include="Google.Protobuf" Version="3.28.2" />
 		
 		<!-- GraphQL -->
-		<PackageReference Include="GraphQL.Client" Version="6.0.2" />
+		<PackageReference Include="GraphQL.Client" Version="6.1.0" />
 		<PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.0.2" />
 		
 		<!-- Additional utilities -->
