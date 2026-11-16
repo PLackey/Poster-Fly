@@ -72,7 +72,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Google.Protobuf" Version="3.28.2" />
+		<PackageReference Include="Google.Protobuf" Version="3.36.2" />
 		
 		<!-- GraphQL -->
 		<PackageReference Include="GraphQL.Client" Version="6.0.2" />
